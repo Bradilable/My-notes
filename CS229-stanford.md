@@ -52,7 +52,7 @@ $$
 In this algorithm, we repeatedly run through the training set, and each time we encounter a training example, we update the parameters according to the gradient of the error with respect to that single training example only. This algorithm is called **stochastic gradient descent**(also **incremental gradient descent**)  
 Stachastic gradient descent "converge" faster in most cases, but it may never truly converge, when the training set is big, stochastic gradient descent is often preferred  
 ### 1.2 The normal equations
-We define the derivative of $$ f with respect to $A$ to be:  
+We define the derivative of $f$ with respect to $A$ to be:  
 
 $$
 \nabla_A f(A) =
@@ -63,8 +63,43 @@ $$
 \end{bmatrix}
 $$  
 
+```math
+\begin{aligned}
+X\theta - \vec{y}
+&=
+\begin{bmatrix}
+(x^{(1)})^T\theta \\
+\vdots \\
+(x^{(n)})^T\theta
+\end{bmatrix}
+-
+\begin{bmatrix}
+y^{(1)} \\
+\vdots \\
+y^{(n)}
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+h_\theta(x^{(1)}) - y^{(1)} \\
+\vdots \\
+h_\theta(x^{(n)}) - y^{(n)}
+\end{bmatrix}.
+\end{aligned}
+```
 
+$$
+\begin{aligned}
+\frac{1}{2}(X\theta - \vec{y})^T(X\theta - \vec{y})
+&= \frac{1}{2}\sum_{i=1}^{n}
+\left(h_\theta(x^{(i)}) - y^{(i)}\right)^2 \\
+&= J(\theta).
+\end{aligned}
+$$
 
+Calculate the derivatives and set them to zero, we obtain the **normal equations**
 
+$$
+X^T X\theta = X^T \vec{y}
+$$  
 
-
+### 1.3 Probabilistic interpretation
