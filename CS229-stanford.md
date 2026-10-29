@@ -103,3 +103,181 @@ X^T X\theta = X^T \vec{y}
 $$  
 
 ### 1.3 Probabilistic interpretation
+Let us assume that the target variables and the inputs are related via the equation  
+
+$$
+y^{(i)} = \theta^T x^{(i)} + \epsilon^{(i)}
+$$  
+
+where $\epsilon^{(i)}$ is an error term, and we assume $\epsilon^{(i)}$ are distributed IID according to Gaussian distribution  
+
+$\epsilon^{(i)} \sim \mathcal{N}(0, \sigma^2)$  
+
+$$
+p(\epsilon^{(i)}) = \frac{1}{\sqrt{2\pi}\sigma}
+\exp\left(-\frac{(\epsilon^{(i)})^2}{2\sigma^2}\right).
+$$  
+
+$$
+p(y^{(i)} \mid x^{(i)}; \theta) = \frac{1}{\sqrt{2\pi}\sigma}
+\exp\left(-\frac{(y^{(i)} - \theta^T x^{(i)})^2}{2\sigma^2}\right).
+$$
+
+We have the **likelihood function**  
+
+$$
+L(\theta) = L(\theta; X, \vec{y}) = p(\vec{y} \mid X; \theta).
+$$  
+
+By the independence assumption, this can also be written  
+
+$$
+\begin{aligned}
+L(\theta)
+&= \prod_{i=1}^{n} p(y^{(i)} \mid x^{(i)}; \theta) \\
+&= \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi}\sigma}
+\exp\left(-\frac{(y^{(i)} - \theta^T x^{(i)})^2}{2\sigma^2}\right).
+\end{aligned}
+$$  
+
+According to the **maximum likelihood** principal and **log likelihood** $\mathcal{l}(\theta)$  
+
+$$
+\begin{aligned}
+\ell(\theta)
+&= \log L(\theta) \\
+&= \log \prod_{i=1}^{n}
+\frac{1}{\sqrt{2\pi}\sigma}
+\exp\left(-\frac{(y^{(i)}-\theta^T x^{(i)})^2}{2\sigma^2}\right) \\
+&= \sum_{i=1}^{n} \log\left[
+\frac{1}{\sqrt{2\pi}\sigma}
+\exp\left(-\frac{(y^{(i)}-\theta^T x^{(i)})^2}{2\sigma^2}\right)
+\right] \\
+&= n\log\frac{1}{\sqrt{2\pi}\sigma}
+-\frac{1}{\sigma^2}\cdot\frac{1}{2}
+\sum_{i=1}^{n}(y^{(i)}-\theta^T x^{(i)})^2.
+\end{aligned}
+$$  
+
+So maximizing $\mathcal{l}(\theta)$ gives the same answer as maximizing $\frac{1}{2}\sum_{i=1}^{n}\left(y^{(i)}-\theta^T x^{(i)}\right)^2$, which is same as LMS  
+### 1.4  Locally weighted linear regression
+The figure on the left: underfitting, the figure on the right: overfitting
+<img width="470" height="131" alt="image" src="https://github.com/user-attachments/assets/43f40398-1b0a-4fb1-b513-a77dfd789ad8" />  
+One solution: using **locally weighted linear regression**(LWR) which works as follows:  
+1. Fit $\theta$ to minimize $\omega^{(i)}\sum_{i=1}^{n}\left(y^{(i)}-\theta^T x^{(i)}\right)^2$
+2. Output $\theta^T x^{(i)}$
+Here $\omega^{(i)}$ is the weight
+A fairly stabdard choice for the weights is
+
+$$
+w^{(i)} = \exp\left(-\frac{(x^{(i)} - x)^2}{2\tau^2}\right)
+$$  
+
+$\tau$ is called the **bandwidth** parameter  
+LMR is a sort of **non-parametric** algorithm, in contrast to (unweighted) linear regression, which is known as **parametric** algorithm  
+## Chapter 2 Classification and logistic regression  
+In this chapter we'll focus on the **binary classification**  
+0 is called the negative class, 1 is called the positive class, $y$ given $x$ is also called the label
+### 2.1 Logistic regression
+First of all we need to change our hypothesis to fit our question  
+
+$$
+h_\theta(x) = g(\theta^T x) = \frac{1}{1 + e^{-\theta^T x}}
+$$
+
+$$
+g(z) = \frac{1}{1 + e^{-z}}
+$$
+
+where $g(z)$ is called the **logistic function** or the **sigmoid function**
+<img width="286" height="221" alt="image" src="https://github.com/user-attachments/assets/e7e87ea5-2e45-453b-bc01-1669f54d8efc" />  
+The derivative of $g(z)$ is $g(z)(1 - g(z))$  
+We assume that
+
+$$
+\begin{aligned}
+P(y = 1 \mid x; \theta) &= h_\theta(x) \\
+P(y = 0 \mid x; \theta) &= 1 - h_\theta(x)
+\end{aligned}
+$$
+
+This can be written more compactly as  
+
+$$
+p(y \mid x; \theta) = (h_\theta(x))^y (1 - h_\theta(x))^{1-y}
+$$
+
+Assuming the n training examples were generated independently
+
+$$
+\begin{aligned}
+L(\theta)
+&= p(\vec{y} \mid X; \theta) \\
+&= \prod_{i=1}^{n} p(y^{(i)} \mid x^{(i)}; \theta) \\
+&= \prod_{i=1}^{n}
+\left(h_\theta(x^{(i)})\right)^{y^{(i)}}
+\left(1 - h_\theta(x^{(i)})\right)^{1-y^{(i)}}
+\end{aligned}
+$$
+
+Again we'll take it's log likelihood
+
+$$
+\ell(\theta) = \log L(\theta) = \sum_{i=1}^{n} y^{(i)} \log h(x^{(i)}) + (1-y^{(i)}) \log(1-h(x^{(i)}))
+$$
+
+Take it's derivative we have the stochastic gradient ascent rule
+
+$$
+\theta_j := \theta_j + \alpha \left(y^{(i)} - h_\theta(x^{(i)})\right)x_j^{(i)}
+$$
+
+### 2.2 Digression: the perceptron learning algorithm
+
+$$
+g(z) =
+\begin{cases}
+1 & \text{if } z \ge 0 \\
+0 & \text{if } z < 0
+\end{cases}
+$$
+
+If we use this threshold function to replace sigmoid function, we get the **perceptron learning algorithm**
+### 2.3 Multi-class classification
+We use the **softmax function** to handle the multi-class classification
+
+```math
+\begin{bmatrix}
+P(y=1 \mid x;\theta) \\
+\vdots \\
+P(y=k \mid x;\theta)
+\end{bmatrix}
+=
+\mathrm{softmax}(t_1,\ldots,t_k)
+=
+\begin{bmatrix}
+\dfrac{\exp(\theta_1^T x)}{\sum_{j=1}^{k}\exp(\theta_j^T x)} \\
+\vdots \\
+\dfrac{\exp(\theta_k^T x)}{\sum_{j=1}^{k}\exp(\theta_j^T x)}
+\end{bmatrix}.
+```
+
+So the negative log-likelihood will be  
+
+$$
+\ell(\theta) = \sum_{i=1}^{n} -\log\left(\frac{\exp(\theta_{y^{(i)}}^T x^{(i)})}{\sum_{j=1}^{k}\exp(\theta_j^T x^{(i)})}\right)
+$$
+
+It’s convenient to define the **cross-entropy** loss $\ell_{\mathrm{ce}} : \mathbb{R}^k \times \{1,\ldots,k\} \to \mathbb{R}_{\ge 0}$
+
+$$
+\ell_{\mathrm{ce}}((t_1,\ldots,t_k),y) = -\log\left(\frac{\exp(t_y)}{\sum_{j=1}^{k}\exp(t_j)}\right)
+$$
+
+With this notation we can simply rewrite our negative log-likelihood as
+
+$$
+\ell(\theta) = \sum_{i=1}^{n} \ell_{\mathrm{ce}}\left((\theta_1^T x^{(i)},\ldots,\theta_k^T x^{(i)}),y^{(i)}\right).
+$$
+
+
