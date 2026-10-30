@@ -4,7 +4,7 @@ $x^{(i)}$ is called an input **feature** and $y^{(i)}$ is called a **target**
 $(x^{(i)},y^{(i)})$ is called a **training example**, a list of training examples is called a **training set**  
 $\mathcal{X}$ denotes the space of input values, $\mathcal{Y}$ denotes the space of output values  
 Our goal is to learn a function $h : \mathcal{X} \mapsto \mathcal{Y}$ to predict the value of $y$  
-$h$ is called z **hypothesis**  
+$h$ is called a **hypothesis**  
 If our target is continuous, we call the problem a **regression**; if the target only takes on discrete values, we call the problem a **classification**  
 <img width="157" height="149" alt="image" src="https://github.com/user-attachments/assets/cc002d22-6e5f-45dc-bbbb-10ed58778dcc" />
 
@@ -280,4 +280,61 @@ $$
 \ell(\theta) = \sum_{i=1}^{n} \ell_{\mathrm{ce}}\left((\theta_1^T x^{(i)},\ldots,\theta_k^T x^{(i)}),y^{(i)}\right).
 $$
 
+The cross-entropy loss also has a simple gradient
+
+$$
+\frac{\partial \ell_{\text{ce}}(t, y)}{\partial t_i} = \phi_i - \mathbf{1}\{y = i\}
+$$
+
+In vectorized notations it has the following form
+
+$$
+\frac{\partial \ell_{\text{ce}}(t, y)}{\partial t} = \phi - e_y
+$$
+
+$$
+\frac{\partial \ell(\theta)}{\partial \theta_i} = \sum_{j=1}^n (\phi_i^{(j)} - \mathbf{1}\{y^{(j)} = i\}) \cdot x^{(j)}
+$$
+
+### 2.4 Another algorithm for maximizing $\mathcal{l}(\theta)$
+We can use Newton's method to find the zero of a function, similarly, we can use it to maximizing $\mathcal{l}(\theta)$  
+
+$$
+\theta := \theta - \frac{\ell'(\theta)}{\ell''(\theta)}
+$$
+
+generalize this to logistic regression, we get Newton-Paphson method
+
+$$
+\theta := \theta - H^{-1} \nabla_\theta \ell(\theta)
+$$
+
+Where $H$ is the **Hessian**  
+The resulting method using Newton's method is also called **Fisher scoring**
+## Chapter 3 Generalized linear models
+### The exponential family
+We say that a class of distributions is in the exponential family if it can be written in the form  
+
+$$
+p(y; \eta) = b(y) \exp(\eta^T T(y) - a(\eta))
+$$
+
+Here $\eta$ is called the **natural parameter**(also called the canonical parameter); $T(y)$ is the **sufficient statistic**(in most circumstances $T(y) = y$); and $a(\eta)$ is the **log partition function**  
+It's easy to verify that Bernoulli and Gaussian distributions are examples of exponential family distributions  
+There’re many other distributions that are members of the exponential family: The multinomial, the Poisson, the gamma and the exponential, the beta and the Dirichlet...  
+### 3.2 Constructing GLMs
+To derive a GLM model, we will make the following three assumptions:  
+1. $y|x;\theta \sim$ ExponentialFamily($\eta$)
+2. $h(x) = \mathrm{E}[y|x]$
+3. $\eta$ and $x$ are related linearly
+The target variable $y$ is also called **reponse variable** in GLM terminology
+## Chapter 4 Generative learning algorithms
+Algorithms that try to learn $p(y|x)$ directly are called **discriminative** learning algorithms, algorithms that instead try to model $p(x|y)$ are called **generative** learning algorithms  
+After modeling $p(y)$ and $p(x|y)$, we can use Bayes rule to derive the posterior distribution 
+
+$$
+p(y|x) = \frac{p(x|y)p(y)}{p(x)}
+$$
+
+### 4.1 Gaussian discriminant analysis
 
