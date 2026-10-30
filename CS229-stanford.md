@@ -338,3 +338,11 @@ $$
 
 ### 4.1 Gaussian discriminant analysis
 
+$$
+\begin{aligned}
+p(y) &= \phi^y(1 - \phi)^{1-y} \\
+p(x|y=0) &= \frac{1}{(2\pi)^{d/2}|\Sigma|^{1/2}} \exp \left( -\frac{1}{2}(x - \mu_0)^T \Sigma^{-1} (x - \mu_0) \right) \\
+p(x|y=1) &= \frac{1}{(2\pi)^{d/2}|\Sigma|^{1/2}} \exp \left( -\frac{1}{2}(x - \mu_1)^T \Sigma^{-1} (x - \mu_1) \right)
+\end{aligned}
+$$
+
