@@ -190,7 +190,9 @@ g(z) = \frac{1}{1 + e^{-z}}
 $$
 
 where $g(z)$ is called the **logistic function** or the **sigmoid function**
+
 <img width="286" height="221" alt="image" src="https://github.com/user-attachments/assets/e7e87ea5-2e45-453b-bc01-1669f54d8efc" />  
+
 The derivative of $g(z)$ is $g(z)(1 - g(z))$  
 We assume that
 
@@ -346,3 +348,31 @@ p(x|y=1) &= \frac{1}{(2\pi)^{d/2}|\Sigma|^{1/2}} \exp \left( -\frac{1}{2}(x - \m
 \end{aligned}
 $$
 
+Note that this model is usually applied using only one covariance matrix  
+The log likelihood of the data is give by  
+
+$$
+\begin{aligned}
+\ell(\phi, \mu_0, \mu_1, \Sigma) &= \log \prod_{i=1}^n p(x^{(i)}, y^{(i)}; \phi, \mu_0, \mu_1, \Sigma) \\
+&= \log \prod_{i=1}^n p(x^{(i)}|y^{(i)}; \mu_0, \mu_1, \Sigma)p(y^{(i)}; \phi).
+\end{aligned}
+$$  
+
+By maximizing with respect to the parameters, we find the maximum likelihood estimate of the parameters to be  
+
+$$
+\begin{aligned}
+\phi &= \frac{1}{n} \sum_{i=1}^n 1\{y^{(i)} = 1\} \\
+\mu_0 &= \frac{\sum_{i=1}^n 1\{y^{(i)} = 0\}x^{(i)}}{\sum_{i=1}^n 1\{y^{(i)} = 0\}} \\
+\mu_1 &= \frac{\sum_{i=1}^n 1\{y^{(i)} = 1\}x^{(i)}}{\sum_{i=1}^n 1\{y^{(i)} = 1\}} \\
+\Sigma &= \frac{1}{n} \sum_{i=1}^n (x^{(i)} - \mu_{y^{(i)}})(x^{(i)} - \mu_{y^{(i)}})^T
+\end{aligned}
+$$  
+
+<img width="275" height="222" alt="image" src="https://github.com/user-attachments/assets/15b7476a-39c9-4ce6-8fb2-1b50a566f42a" />
+
+The GDA model has an interesting relationship to logistic regression. GDA makes stronger modeling assumptions about the data than does logistic regression  
+Specifically, when $p(x|y)$ is indeed Gaussian (with shared $\Sigma$), then GDA is **asymptotically efficient**  
+### 4.2 Naive bayes
+
+## Chapter 5 Kernel methods
