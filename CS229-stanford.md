@@ -162,7 +162,9 @@ $$
 So maximizing $\mathcal{l}(\theta)$ gives the same answer as maximizing $\frac{1}{2}\sum_{i=1}^{n}\left(y^{(i)}-\theta^T x^{(i)}\right)^2$, which is same as LMS  
 ### 1.4  Locally weighted linear regression
 The figure on the left: underfitting, the figure on the right: overfitting
+
 <img width="470" height="131" alt="image" src="https://github.com/user-attachments/assets/43f40398-1b0a-4fb1-b513-a77dfd789ad8" />  
+
 One solution: using **locally weighted linear regression**(LWR) which works as follows:  
 1. Fit $\theta$ to minimize $\omega^{(i)}\sum_{i=1}^{n}\left(y^{(i)}-\theta^T x^{(i)}\right)^2$
 2. Output $\theta^T x^{(i)}$
