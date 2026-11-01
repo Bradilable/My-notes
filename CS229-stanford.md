@@ -378,3 +378,34 @@ Specifically, when $p(x|y)$ is indeed Gaussian (with shared $\Sigma$), then GDA 
 ### 4.2 Naive bayes
 
 ## Chapter 5 Kernel methods
+### 5.1 Feature maps
+Instaed of using a linear function, consider fitting cubic function $y = \theta_3 x^3 + \theta_2 x^2 + \theta_1 x + \theta_0$  
+
+$$
+\phi(x) = \begin{bmatrix} 1 \\ x \\ x^2 \\ x^3 \end{bmatrix} \in \mathbb{R}^4.
+$$
+
+We call the map $\phi$ as **feature map**, the original input $x$ are called the **attributes**, the new quantities are called **features**
+### 5.2 LMS with features  
+Replace all the occurrences of $x^{(i)}$ in the algorithm by $\phi(x^{(i)})$ give us the new update  
+
+$$
+\theta := \theta + \alpha \sum_{i=1}^n (y^{(i)} - \theta^T \phi(x^{(i)})) \phi(x^{(i)})
+$$
+
+$$
+\theta := \theta + \alpha \left( y^{(i)} - \theta^T \phi(x^{(i)}) \right) \phi(x^{(i)})
+$$
+
+### 5.3 LMS with the kernel trick
+
+$$
+\phi(x) = \begin{bmatrix} 1 & x_1 & x_2 & \cdots & x_1^2 & x_1x_2 & x_1x_3 & \cdots & x_2x_1 & \cdots & x_1^3 & x_1^2x_2 & \cdots \end{bmatrix}^T.
+$$
+
+The dimension of our features seems too big which makes the algorithm computationally expensive  
+
+
+
+
+
