@@ -509,3 +509,86 @@ $$
 $$
 
 ### 6.4 The optimal margin classifier
+Assume that we are given a training set that is linearly separable
+The optimization problem turns out to be  
+
+$$
+\begin{aligned}
+&\max_{\gamma, w, b} \quad \gamma \\
+&\text{s.t.} \quad y^{(i)}(w^T x^{(i)} + b) \ge \gamma, \quad i = 1, \dots, n \\
+&\quad \quad \ \, \|w\| = 1.
+\end{aligned}
+$$
+
+The $\|\omega\| = 1$ constraint is a non-comvex one, so instead of optimizing $\gamma$ we choose $\hat{\gamma} / \|{\omega}\|$ as our goal
+
+$$
+\begin{aligned}
+&\max_{\hat{\gamma}, w, b} \quad \frac{\hat{\gamma}}{\|w\|} \\
+&\text{s.t.} \quad y^{(i)}(w^T x^{(i)} + b) \ge \hat{\gamma}, \quad i = 1, \dots, n
+\end{aligned}
+$$
+
+We will introduce the scaling constraint that the functional margin of $\omega$, $b$ with respect to the training set must be 1， and we have the following optimization problem
+
+$$
+\begin{aligned}
+\min_{w,b} \quad & \frac{1}{2} \|w\|^2 \\
+\text{s.t.} \quad & y^{(i)}(w^T x^{(i)} + b) \ge 1, \quad i = 1, \dots, n
+\end{aligned}
+$$
+
+The solution gives us the **optimal margin classifier**, this optimization problem can be solved using commercial quadratic programming(QP) code
+### 6.5 Lagrange duality
+Consider a problem of the following form:
+
+$$
+\begin{aligned}
+\min_w \quad & f(w) \\
+\text{s.t.} \quad & h_i(w) = 0, \quad i = 1, \dots, l.
+\end{aligned}
+$$
+
+We define the **Lagrangian** to be
+
+$$
+\mathcal{L}(w, \beta) = f(w) + \sum_{i=1}^l \beta_i h_i(w)
+$$
+
+Here the $\bata_i$'s are called the **Lagrange multipliers**  
+Set $\mathcal{L}$'s partial derivatives to zero
+
+$$
+\frac{\partial \mathcal{L}}{\partial w_i} = 0; \quad \frac{\partial \mathcal{L}}{\partial \beta_i} = 0
+$$
+
+Consider the **primal** optimization problem
+
+$$
+\begin{aligned}
+\min_w \quad & f(w) \\
+\text{s.t.} \quad & g_i(w) \le 0, \quad i = 1, \dots, k \\
+& h_i(w) = 0, \quad i = 1, \dots, l.
+\end{aligned}
+$$
+
+To solve it, we start by defining the **generalized Lagrangian**
+
+$$
+\mathcal{L}(w, \alpha, \beta) = f(w) + \sum_{i=1}^k \alpha_i g_i(w) + \sum_{i=1}^l \beta_i h_i(w)
+$$
+
+$$
+\theta_{\mathcal{P}}(w) = \max_{\alpha, \beta : \alpha_i \ge 0} \mathcal{L}(w, \alpha, \beta)
+$$
+
+We have $\theta$ as a criterion
+
+$$
+\theta_{\mathcal{P}}(w) = \begin{cases} 
+f(w) & \text{if } w \text{ satisfies primal constraints} \\
+\infty & \text{otherwise.}
+\end{cases}
+$$
+
+# Part 2 Deep learning
