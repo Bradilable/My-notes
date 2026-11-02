@@ -460,8 +460,52 @@ The necessary and sufficient condition for $K$ to be a valid kernel(also called 
 <img width="504" height="78" alt="image" src="https://github.com/user-attachments/assets/45457809-3718-4c36-bef7-d0f867eba735" />
 
 ## Chapter 6 Support vector machines  
-### 6.1 Margins:intuition
+### 6.1 Margins: intuition
+The decision boundary given by the equation $\theta^{T}x = 0$ is called the **separating hyperplane** 
 
+<img width="295" height="269" alt="image" src="https://github.com/user-attachments/assets/6a7e2def-f39c-4ec0-92f0-00fb607a5e9e" />
 
+We see that if a point is far from the separating hyperplane, then we may be significantly more confident in our predictions  
+Informally we think it would be nice if, given a training set, we manage to find a decision boundary that
+allows us to make all correct and confident predictions on the training examples  
+### 6.2 Notation  
+We now use $y \in \\{-1, 1\\}$ (instead of $\\{0, 1\\}$)  
+Rather thanparameterizing our linear classifier with the vector $\theta$, we write our classifier as
 
+$$
+h_{w,b}(x) = g(\omega^T x + b)
+$$
 
+### 6.3 Functional and geometric margins
+Given a training example($x^{(i)}$, $y^{(i)}$), we define the **functional margin** of ($\omega$, $b$)  
+We see that by scaling $\omega$ and $b$ we can make the functional margin arbitrarily large without really changing anything meaningful  
+We do the normalization by replacing ($\omega$, $b$) with $(w / \|w\|_2, b / \|w\|_2)$  
+For a training set $S = \\{(x^{(i)},y^{(i)}); i = 1,...,n \\}$, we also define the functional margin of ($\omega$, $b$)with respect to $S$ as the smallest of the functional margins of the individual training examples as follows
+
+$$
+\hat{\gamma} = \min_{i=1,\dots,n} \hat{\gamma}^{(i)}
+$$
+
+<img width="298" height="257" alt="image" src="https://github.com/user-attachments/assets/a0c19f58-e1e6-4caf-b983-03073e9f2d3d" />
+
+$$
+w^T \left( x^{(i)} - \gamma^{(i)} \frac{w}{\|w\|} \right) + b = 0.
+$$
+
+$$
+\gamma^{(i)} = \frac{w^T x^{(i)} + b}{\|w\|} = \left( \frac{w}{\|w\|} \right)^T x^{(i)} + \frac{b}{\|w\|}.
+$$
+
+Gernerally, we define the **geometric margin**
+
+$$
+\gamma^{(i)} = y^{(i)} \left( \left( \frac{w}{\|w\|} \right)^T x^{(i)} + \frac{b}{\|w\|} \right)
+$$
+
+For a training set $S$, we also define the geometric margin as
+
+$$
+{\gamma} = \min_{i=1,\dots,n} {\gamma}^{(i)}
+$$
+
+### 6.4 The optimal margin classifier
