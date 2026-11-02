@@ -404,7 +404,63 @@ $$
 $$
 
 The dimension of our features seems too big which makes the algorithm computationally expensive  
+Assume at some point, $\theta$ can be represented as  
 
+$$
+\theta = \sum_{i=1}^n \beta_i \phi(x^{(i)})
+$$
+
+Then we claim that in the next round, $\theta$ is still a linear combination of $\phi(x^{(1)})$,..., $\phi(x^{(n)})$ because
+
+$$
+\begin{aligned}
+\theta &:= \theta + \alpha \sum_{i=1}^n (y^{(i)} - \theta^T \phi(x^{(i)})) \phi(x^{(i)}) \\
+&= \sum_{i=1}^n \beta_i \phi(x^{(i)}) + \alpha \sum_{i=1}^n (y^{(i)} - \theta^T \phi(x^{(i)})) \phi(x^{(i)}) \\
+&= \sum_{i=1}^n \underbrace{(\beta_i + \alpha (y^{(i)} - \theta^T \phi(x^{(i)})))}_{\text{new } \beta_i} \phi(x^{(i)})
+\end{aligned}
+$$
+
+$$
+\beta_i := \beta_i + \alpha \left( y^{(i)} - \theta^T \phi(x^{(i)}) \right)
+$$
+
+$$
+\forall i \in \{1, \dots, n\}, \beta_i := \beta_i + \alpha \left( y^{(i)} - \sum_{j=1}^n \beta_j \phi(x^{(j)})^T \phi(x^{(i)}) \right)
+$$
+
+1)We can pre-compute the pairwise inner products < $\phi(x^{(i)})$, $\phi(x^{(j)})$ > for all pairs of $i$, $j$ before the loop starts  
+2)Instaed of computing < $\phi(x)$, $\phi(z)$ >, we can use < $x$, $z$ > to calculate the inner products  
+We define the **Kernel** as a function  
+
+$$
+K(x, z) \triangleq \langle \phi(x), \phi(z) \rangle
+$$
+
+$K$ is also used to present the kernel matrix, which is a $n \times n$ matrix with $K_{ij} = K(x^{(i)},x^{(j)})$, we have
+
+$$
+\beta := \beta + \alpha(\vec{y} - K\beta)
+$$
+
+$$
+\theta^T \phi(x) = \sum_{i=1}^n \beta_i \phi(x^{(i)})^T \phi(x) = \sum_{i=1}^n \beta_i K(x^{(i)}, x)
+$$
+
+### 5.4 Properties of kernels
+The kernel $K(x, z) = (x^T z + c)^k$ correspondsto a feature mapping to an $\binom{d+k}{k}$ feature space, corresponding of all monomials of the form $x_{i_1}$ $x_{i_2}$ ... $x_{i_k}$ that are up to order $k$  
+**Kernels as similarity metrics**: since Kernel contains inner product, it could be seen as a metric of similarity  
+An example is **Gaussian kernel**
+
+$$
+K(x, z) = \exp \left( -\frac{\|x - z\|^2}{2\sigma^2} \right)
+$$
+
+The necessary and sufficient condition for $K$ to be a valid kernel(also called a **Mercer kernel**)  
+
+<img width="504" height="78" alt="image" src="https://github.com/user-attachments/assets/45457809-3718-4c36-bef7-d0f867eba735" />
+
+## Chapter 6 Support vector machines  
+### 6.1 Margins:intuition
 
 
 
