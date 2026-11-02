@@ -555,7 +555,7 @@ $$
 \mathcal{L}(w, \beta) = f(w) + \sum_{i=1}^l \beta_i h_i(w)
 $$
 
-Here the $\bata_i$'s are called the **Lagrange multipliers**  
+Here the $\beta_i$'s are called the **Lagrange multipliers**  
 Set $\mathcal{L}$'s partial derivatives to zero
 
 $$
