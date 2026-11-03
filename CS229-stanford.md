@@ -446,7 +446,7 @@ $K$ is also used to denote the kernel matrix, which is a $n \times n$ matrix wit
 
 $$
 \beta := \beta + \alpha(\vec{y} - K\beta)
-$
+$$
 
 This is a simultaneous batch update: all components use the previous value of $\beta$.
 
@@ -607,3 +607,140 @@ f(w) & \text{if } w \text{ satisfies primal constraints} \\
 $$
 
 # Part 2 Deep learning
+## 7.1 Supervised learning with non-linear models
+Consider **regression problems**, we define the least square cost function for the $i$-th example as
+
+$$
+J^{(i)}(\theta) = \frac{1}{2}(h_\theta(x^{(i)}) - y^{(i)})^2
+$$
+
+And the mean-square cost function for the dataset as  
+
+$$
+J(\theta) = \frac{1}{n} \sum_{i=1}^n J^{(i)}(\theta)
+$$
+
+**binary classification**
+
+$$
+h_\theta(x) = g(\bar{h}_\theta(x)) = 1/(1 + \exp(-\bar{h}_\theta(x)))
+$$
+
+$$
+\begin{aligned}
+P(y = 1 \mid x; \theta) &= h_\theta(x) \\
+P(y = 0 \mid x; \theta) &= 1 - h_\theta(x)
+\end{aligned}
+$$
+
+$$
+J^{(i)}(\theta) = - \log p(y^{(i)} \mid x^{(i)}; \theta) = \ell_{\text{logistic}}(\bar{h}_\theta(x^{(i)}), y^{(i)})
+$$
+
+$$
+J(\theta) = \frac{1}{n} \sum_{i=1}^n J^{(i)}(\theta)
+$$
+
+**Multi-class classification**
+We have the logits $\bar{h}_\theta : \mathbb{R}^d \to \mathbb{R}^k$
+
+$$
+P(y = j \mid x; \theta) = \frac{\exp(\bar{h}_\theta(x)_j)}{\sum_{s=1}^k \exp(\bar{h}_\theta(x)_s)}
+$$
+
+$$
+J^{(i)}(\theta) = - \log p(y^{(i)} \mid x^{(i)}; \theta) = - \log \left( \frac{\exp(\bar{h}_\theta(x^{(i)})_{y^{(i)}})}{\sum_{s=1}^k \exp(\bar{h}_\theta(x^{(i)})_s)} \right)
+$$
+
+Again, we have
+
+$$
+J(\theta) = \frac{1}{n} \sum_{i=1}^n J^{(i)}(\theta)
+$$
+
+**Optimizers(SGD)**
+
+<img width="496" height="164" alt="image" src="https://github.com/user-attachments/assets/c089fc75-c3dc-47b3-9c8f-8e94aedd710c" />
+
+<img width="488" height="209" alt="image" src="https://github.com/user-attachments/assets/21a31d5e-d2d8-410f-821e-997144c16fb2" />
+
+With all these generic algorithms, a typical deep learning model is learned with the following steps  
+(1) Define a neural network parametrization $h_{\theta}(x)$  
+(2)write the backpropagation algorithm to compute the gradient of the loss function $J^{(i)}(\theta)$ efficiently  
+(3)run SGD or mini-batch SGD with the loss function $J(\theta)$  
+### 7.2 Neural networks  
+**Neural networks** refer to a broad type of non-linear models/parametrizations $\bar h_{\theta}(x)$ that involve combinations of matrix multiplications and other entrywise non-linear operations.  
+**A Nerual Network with a Single Neurom**  
+
+$$
+\bar{h}_\theta(x) = \max(wx + b, 0), \text{ where } \theta = (w, b) \in \mathbb{R}^2
+$$
+
+The function max{$t,0$} is called a **ReLu**(rectified linear unit)  
+Generally, a one-dimensional non-linear function that maps $\mathbb{R}$ to $\mathbb{R}$ such as ReLU is often referred to as an **activation function**  
+
+$$
+\bar{h}_\theta(x) = \text{ReLU}(w^\top x + b), \text{ where } w \in \mathbb{R}^d, b \in \mathbb{R}, \text{ and } \theta = (w, b)
+$$  
+
+**Stacking Neurons**
+A more complex neural network may take the single neuron described above and “stack” them together such that one neuron passes its output as input into the next neuron  
+Formally, the input to a neural network is a set of input features $x_1 , x_2 , x_3 , x_4$  
+We call the intermediate variables **hidden units** or **hidden neurons**  
+**Two-layer Fully-Connected Neural Networks**  
+When all the interemediate variavbles depend on all th einputs, we call th enetwork **fully-connected neural network**  
+For example, a two-layer fully-connected neural network with $m$ hidden units and $d$ dimensional input $x \in {R}^d$ is defined as  
+
+$$
+\begin{aligned}
+\forall j \in [1, \dots, m], \quad z_j &= w_j^{[1]\top} x + b_j^{[1]} \text{ where } w_j^{[1]} \in \mathbb{R}^d, b_j^{[1]} \in \mathbb{R} \\
+a_j &= \text{ReLU}(z_j), \\
+a &= [a_1, \dots, a_m]^\top \in \mathbb{R}^m \\
+\bar{h}_\theta(x) &= w^{[2]\top} a + b^{[2]} \text{ where } w^{[2]} \in \mathbb{R}^m, b^{[2]} \in {R}
+\end{aligned}
+$$
+
+We define a weight matrix in the following way  
+
+$$
+W^{[1]} =
+\begin{bmatrix}
+-\, {w_1^{[1]}}^\top \,- \\
+-\, {w_2^{[1]}}^\top \,- \\
+\vdots \\
+-\, {w_m^{[1]}}^\top \,-
+\end{bmatrix}
+\in \mathbb{R}^{m \times d}
+$$
+
+```math
+\underbrace{
+\begin{bmatrix}
+z_1 \\ \vdots \\ \vdots \\ z_m
+\end{bmatrix}
+}_{z \in \mathbb{R}^{m \times 1}}
+=
+\underbrace{
+\begin{bmatrix}
+-\, {w_1^{[1]}}^\top \,- \\
+-\, {w_2^{[1]}}^\top \,- \\
+\vdots \\
+-\, {w_m^{[1]}}^\top \,-
+\end{bmatrix}
+}_{W^{[1]} \in \mathbb{R}^{m \times d}}
+\underbrace{
+\begin{bmatrix}
+x_1 \\ x_2 \\ \vdots \\ x_d
+\end{bmatrix}
+}_{x \in \mathbb{R}^{d \times 1}}
++
+\underbrace{
+\begin{bmatrix}
+b_1^{[1]} \\ b_2^{[1]} \\ \vdots \\ b_m^{[1]}
+\end{bmatrix}
+}_{b^{[1]} \in \mathbb{R}^{m \times 1}}
+```
+
+$$
+z = W^{[1]}x + b^{[1]}
+$$
