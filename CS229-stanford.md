@@ -1,6 +1,6 @@
 # Part 1 Supervised Learning
 
-> Notation: $h_\theta$ denotes the hypothesis, $L$ the likelihood, $\ell = \log L$ the log-likelihood, and $J$ the cost (negative log-likelihood in Section 2.3). LWR uses scalar weights $w^{(i)}$; SVM uses a weight vector $w$ and bias $b$. Inline formulas use `$...; display formulas use `$` on separate lines.
+> Notation: $h_\theta$ denotes the hypothesis, $L$ the likelihood, $\ell = \log L$ the log-likelihood, and $J$ the cost (negative log-likelihood in Section 2.3). LWR uses scalar weights $w^{(i)}$; SVM uses a weight vector $w$ and bias $b$. Inline formulas use one dollar sign on each side. Most display formulas use two dollar signs on each side, on separate lines.
 
 ## Chapter 0 Basic concepts
 $x^{(i)}$ is called an input **feature** and $y^{(i)}$ is called a **target**  
@@ -477,13 +477,14 @@ We see that if a point is far from the separating hyperplane, then we may be sig
 Informally we think it would be nice if, given a training set, we manage to find a decision boundary that
 allows us to make all correct and confident predictions on the training examples  
 ### 6.2 Notation  
-We now use $y \in \{-1, 1\}$ (instead of $\{0, 1\}$)  
+We now use $y \in \lbrace -1, 1 \rbrace$ (instead of $\lbrace 0, 1 \rbrace$)  
 Rather than parameterizing our linear classifier with the vector $\theta$, we write our classifier as
 
 $$
-h_{w,b}(x) = g(w^T x + b), \qquad
- g(z) = \begin{cases} 1 & \text{if } z \ge 0 \\ -1 & \text{if } z < 0 \end{cases}
+h_{w,b}(x) = g(w^T x + b)
 $$
+
+Here $g(z) \in \lbrace -1, 1 \rbrace$: $g(z)=1$ if $z \ge 0$, and $g(z)=-1$ if $z<0$.
 
 ### 6.3 Functional and geometric margins
 Given a training example($x^{(i)}$, $y^{(i)}$), we define the **functional margin** of $(w,b)$ as
