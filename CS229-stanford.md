@@ -66,7 +66,7 @@ $$
 \end{bmatrix}
 $$
 
-$$
+```math
 \begin{aligned}
 X\theta - \vec{y}
 &=
@@ -88,7 +88,7 @@ h_\theta(x^{(1)}) - y^{(1)} \\
 h_\theta(x^{(n)}) - y^{(n)}
 \end{bmatrix}.
 \end{aligned}
-$$
+```
 
 $$
 \begin{aligned}
@@ -254,7 +254,7 @@ If we use this threshold function to replace sigmoid function, we get the **perc
 ### 2.3 Multi-class classification
 We use the **softmax function** to handle the multi-class classification
 
-$$
+```math
 \begin{bmatrix}
 P(y=1 \mid x;\theta) \\
 \vdots \\
@@ -268,7 +268,7 @@ P(y=k \mid x;\theta)
 \vdots \\
 \dfrac{\exp(\theta_k^T x)}{\sum_{j=1}^{k}\exp(\theta_j^T x)}
 \end{bmatrix}.
-$$
+```
 
 So the negative log-likelihood will be  
 
