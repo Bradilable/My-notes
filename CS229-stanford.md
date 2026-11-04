@@ -665,7 +665,7 @@ $$
 <img width="488" height="209" alt="image" src="https://github.com/user-attachments/assets/21a31d5e-d2d8-410f-821e-997144c16fb2" />
 
 With all these generic algorithms, a typical deep learning model is learned with the following steps  
-(1) Define a neural network parametrization $h_{\theta}(x)$  
+(1)Define a neural network parametrization $h_{\theta}(x)$  
 (2)write the backpropagation algorithm to compute the gradient of the loss function $J^{(i)}(\theta)$ efficiently  
 (3)run SGD or mini-batch SGD with the loss function $J(\theta)$  
 ### 7.2 Neural networks  
@@ -744,3 +744,153 @@ b_1^{[1]} \\ b_2^{[1]} \\ \vdots \\ b_m^{[1]}
 $$
 z = W^{[1]}x + b^{[1]}
 $$
+
+$$
+a = ReLU(z)
+$$
+
+**Multi-layer fully-connected neural networks**
+
+$$
+\begin{aligned}
+a^{[1]} &= \mathrm{ReLU}(W^{[1]}x + b^{[1]}) \\
+a^{[2]} &= \mathrm{ReLU}(W^{[2]}a^{[1]} + b^{[2]}) \\
+\dots \\
+a^{[r-1]} &= \mathrm{ReLU}(W^{[r-1]}a^{[r-2]} + b^{[r-1]}) \\
+\bar{h}_\theta(x) &= W^{[r]}a^{[r-1]} + b^{[r]}
+\end{aligned}
+$$
+ 
+The total number of neurons in the network is $m_1 + ··· + m_r$  
+The total number of parameters in the network is $(d+1)m_1 + (m_1 +1)m_2 + ··· + (m_{r-1}+1)m_r$  
+**Other activation functions**
+The activation function ReLU can be replaced by many other non-linear function $\sigma(·)$ that maps $R$ to $R$ such as  
+
+<img width="332" height="180" alt="image" src="https://github.com/user-attachments/assets/a9edd20e-f34c-4580-8a1e-fbc6913f7c18" />
+
+
+<img width="411" height="220" alt="image" src="https://github.com/user-attachments/assets/3e2ce350-282e-4f1a-92e4-c03e6fdea5ae" />
+
+**Connection to the kernel method**
+The process of choosing the feature maps is often referred to as **feature engineering**  
+The penultimate layer $a[r]$ is often (informally) referred to as the **learned features** or representations in the context of deep learning  
+### 7.3 Modules in modern Neural Networks  
+The multi-layer neural network introduced above is often called **multi-layer perceptron**(MLP) these days  
+
+$$
+\mathrm{MM}_{W,b}(z) = Wz + b
+$$
+
+$$
+\text{MLP}(x) = \text{MM}_{W^{[r]},b^{[r]}} \left( \sigma \left( \text{MM}_{W^{[r-1]},b^{[r-1]}} \left( \sigma \left( \cdots \text{MM}_{W^{[1]},b^{[1]}}(x) \right) \right) \right) \right)
+$$
+
+$$
+\text{MLP}(x) = \text{MM}(\sigma(\text{MM}\sigma(\cdots \text{MM}(x))))
+$$
+
+**Residual connection**
+
+$$
+\text{Res}(z) = z + \sigma(\text{MM}(\sigma(\text{MM}(z))))
+$$
+
+$$
+\text{ResNet-S}(x) = \text{MM}(\text{Res}(\text{Res}(\cdots \text{Res}(x))))
+$$
+
+
+<img width="428" height="170" alt="image" src="https://github.com/user-attachments/assets/95b26db8-3abd-4cef-a93d-6774f419c2dd" />
+
+**Layer normalization**
+We first define a sub-module of the layer normalization, denoted by LN-S  
+
+$$
+\text{LN-S}(z) = \begin{bmatrix} 
+\frac{z_1 - \hat{\mu}}{\hat{\sigma}} \\ 
+\frac{z_2 - \hat{\mu}}{\hat{\sigma}} \\ 
+\vdots \\ 
+\frac{z_m - \hat{\mu}}{\hat{\sigma}} 
+\end{bmatrix}
+$$
+
+Often times zero mean and standard deviation 1 is not the most desired normalization scheme, and thus layernorm introduces to parameters learnable scalars $\beta$ and $\gamma$ as the desired mean and standard deviation  
+
+$$
+\text{LN}(z) = \beta + \gamma \cdot \text{LN-S}(z) = \begin{bmatrix} 
+\beta + \gamma \left( \frac{z_1 - \hat{\mu}}{\hat{\sigma}} \right) \\ 
+\beta + \gamma \left( \frac{z_2 - \hat{\mu}}{\hat{\sigma}} \right) \\ 
+\vdots \\ 
+\beta + \gamma \left( \frac{z_m - \hat{\mu}}{\hat{\sigma}} \right) 
+\end{bmatrix}
+$$
+
+$\beta$ and $\gamma$ are learnable parameters and thus layernorm is a parameterized module(as opposed to the activation layer which doesn't have any parameters)  
+Suppose we consider composing $LN$ with $MM_{W,b}$ and get a subnetwork $LN({MM_{W,b}})$
+
+$$
+\text{LN}(\text{MM}_{\alpha W, \alpha b}(z)) = \text{LN}(\text{MM}_{W,b}(z)), \forall \alpha > 0
+$$
+
+Obviously, this subnetwork is scaling-invariant  
+We also have other normalization layers, such as batch-normalization and group normalization  
+**Convolutional Layers**  
+We start by introducing a simplified version of the 1-D convolution layer, denoted by **Conv1D-S(·)** which is a type of matrix multiplication layer with a special structure  
+The parameters of Conv1D-S are a filter vector $\omega \in R^k$ where $k$ is called the **filter size**
+
+$$
+\text{Conv1D-S}(z)_i = w_1 z_{i-\ell} + w_2 z_{i-\ell+1} + \cdots + w_{2\ell+1} z_{i+\ell} = \sum_{j=1}^{2\ell+1} w_j z_{i-\ell+(j-1)}
+$$
+
+Computing the convolution only takes $O(km)$ time but computing a generic matrix multiplication takes $O(m^2)$  
+
+
+### 7.4 Backpropagation
+Because the formality of the general theorem is not the main focus here, we will introduce the terms with informal definitions. By a differentiable circuit or a differentiable network, we mean a composition of a sequence of differentiable arithmetic operations (additions, subtraction, multiplication, divisions, etc) and elementary differentiable functions (ReLU, exp, log, sin, cos, etc.). Let the size of the circuit be the total number of such operations and elementary functions. We assume that each of the operations and functions, and their derivatives or partial derivatives ecan be computed in $O(1)$ time
+
+$$
+\begin{aligned}
+& \textbf{Theorem 7.4.1:} \textit{[backpropagation or auto-differentiation, informally stated]} \\
+& \textit{Suppose a differentiable circuit of size } N \textit{ computes a real-valued function} \\
+& f : \mathbb{R}^\ell \to \mathbb{R}. \textit{ Then, the gradient } \nabla f \textit{ can be computed in time } O(N), \textit{ by a} \\
+& \textit{circuit of size } O(N).
+\end{aligned}
+$$
+
+### 7.5 Vectorization over training examples
+We hope to leverage the parallelism across the multiple examples  
+Assume that we have three examples $x_1, x_2, x_3$  
+The first-layer activations for each example are as follows
+
+```math
+\begin{aligned}
+z^{[1](1)} &= W^{[1]}x^{(1)} + b^{[1]} \\
+z^{[1](2)} &= W^{[1]}x^{(2)} + b^{[1]} \\
+z^{[1](3)} &= W^{[1]}x^{(3)} + b^{[1]}
+\end{aligned}
+```
+
+Again, we vectorize these operations  
+
+$$
+X =
+\begin{bmatrix}
+| & | & | \\
+x^{(1)} & x^{(2)} & x^{(3)} \\
+| & | & |
+\end{bmatrix}
+\in \mathbb{R}^{d \times 3}
+$$
+
+```math
+Z^{[1]} =
+\begin{bmatrix}
+\vert & \vert & \vert \\
+z^{[1](1)} & z^{[1](2)} & z^{[1](3)} \\
+\vert & \vert & \vert
+\end{bmatrix}
+= W^{[1]}X + b^{[1]}
+```
+
+
+# Part 3 Generalization and regularization
