@@ -923,3 +923,12 @@ z^{[1](1)} & z^{[1](2)} & z^{[1](3)} \\
 
 
 # Part 3 Generalization and regularization
+The loss function for training purposes is oftentimes referred to as the **training loss**, while our ultimate goal is to minimize **test error**  
+
+$$
+L(\theta) = \mathbb{E}_{(x,y) \sim \mathcal{D}}[(y - h_\theta(x))^2]
+$$
+
+Here $\mathcal{D}$ denotes the **test distribution**  
+We typically say the model **overfits** the data if the model predicts accurately on the training dataset but doesn’t generalize well to other test examples, that is, if the training error is small but the test error is large. We say the model **underfits** the data if the training error is relatively large(and in this case, typically the test error is also relatively large.)  
+### 8.1 Bias-variance tradeoff  
