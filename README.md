@@ -40,7 +40,17 @@
 
 ### [Part 2 Deep learning](CS229-stanford.md#part-2-deep-learning)
 
-Part 2 目前仅保留标题，内容待补充。上面的索引对应笔记现有章节。
+- [7.1 Supervised learning with non-linear models](CS229-stanford.md#71-supervised-learning-with-non-linear-models)
+- [7.2 Neural networks](CS229-stanford.md#72-neural-networks)
+- [7.3 Modules in modern Neural Networks](CS229-stanford.md#73-modules-in-modern-neural-networks)（含残差连接、层归一化与卷积层）
+- [7.4 Backpropagation](CS229-stanford.md#74-backpropagation)
+- [7.5 Vectorization over training examples](CS229-stanford.md#75-vectorization-over-training-examples)
+
+### [Part 3 Generalization and regularization](CS229-stanford.md#part-3-generalization-and-regularization)
+
+已包含训练损失、测试误差及过拟合与欠拟合的概述。
+
+- [8.1 Bias-variance tradeoff](CS229-stanford.md#81-bias-variance-tradeoff)（待补充）
 
 ## 数学公式与符号约定
 
