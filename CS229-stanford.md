@@ -843,7 +843,36 @@ $$
 $$
 
 Computing the convolution only takes $O(km)$ time but computing a generic matrix multiplication takes $O(m^2)$  
+$\omega$ is called the **filter** or **kernel**  
+We can also view it as a matrix multiplicationwith shared parameters: $Conv1D-S(z) = Qz$, where
 
+$$
+Q = \begin{bmatrix}
+w_{\ell+1} & \cdots & w_{2\ell+1} & 0 & 0 & \cdots & \cdots & \cdots & \cdots & \cdots & \cdots & 0 \\
+w_\ell & \cdots & w_{2\ell} & w_{2\ell+1} & 0 & \cdots & \cdots & \cdots & \cdots & \cdots & \cdots & 0 \\
+\vdots & & & & & & & & & & & \\
+w_1 & \cdots & w_{\ell+1} & \cdots & \cdots & \cdots & w_{2\ell+1} & 0 & \cdots & \cdots & \cdots & 0 \\
+0 & w_1 & \cdots & \cdots & \cdots & \cdots & w_{2\ell} & w_{2\ell+1} & 0 & \cdots & \cdots & 0 \\
+\vdots & & & & & & & & & & & \\
+\vdots & & & & & & & & & & & \\
+0 & \cdots & \cdots & \cdots & \cdots & \cdots & 0 & w_1 & \cdots & \cdots & \cdots & w_{2\ell+1} \\
+\vdots & & & & & & & & & & & \\
+0 & \cdots & \cdots & \cdots & \cdots & \cdots & \cdots & \cdots & 0 & w_1 & \cdots & w_{\ell+1}
+\end{bmatrix}
+$$
+
+Note that convolution is a matrix multiplication with shared parameters  
+The number of vectors that are inputed is referred to as the number of **channels**, we also have **output channels**  
+
+$$
+\forall i \in [C'], \text{Conv1D}(z)_i = \sum_{j=1}^C \text{Conv1D-S}_{i,j}(z_j)
+$$
+
+For 2-D convolution, it turns into  
+
+$$
+\forall i \in [C'], \text{Conv2D}(z)_i = \sum_{j=1}^C \text{Conv2D-S}_{i,j}(z_j)
+$$
 
 ### 7.4 Backpropagation
 Because the formality of the general theorem is not the main focus here, we will introduce the terms with informal definitions. By a differentiable circuit or a differentiable network, we mean a composition of a sequence of differentiable arithmetic operations (additions, subtraction, multiplication, divisions, etc) and elementary differentiable functions (ReLU, exp, log, sin, cos, etc.). Let the size of the circuit be the total number of such operations and elementary functions. We assume that each of the operations and functions, and their derivatives or partial derivatives ecan be computed in $O(1)$ time
