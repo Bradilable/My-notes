@@ -932,3 +932,42 @@ $$
 Here $\mathcal{D}$ denotes the **test distribution**  
 We typically say the model **overfits** the data if the model predicts accurately on the training dataset but doesn’t generalize well to other test examples, that is, if the training error is small but the test error is large. We say the model **underfits** the data if the training error is relatively large(and in this case, typically the test error is also relatively large.)  
 ### 8.1 Bias-variance tradeoff  
+Informally, we define the **bias** of a model to be the test error even if we were to fit it to a very (say, infinitely) large training dataset  
+The **variance** can be intuitively characterized by the amount of variations across models learnt on multiple different training datasets (drawn from the same underlying distribution)  
+Often, there is a tradeoff between the bias and variance  
+To formally state the bias-variance tradeo↵ for regression problems, we consider the following setup  
+
+Draw a training dataset $S = \\{x^{(i)}, y^{(i)} \\}^{n}_{i=1}$ such that $y^{(i)} = h^\star(x^{(i)}) + \xi^{(i)}$ where $\xi^{(i)} \in N(0,\sigma^2)$  
+Train a model on the dataset $S$, denoted by $\hat h_S$  
+Take a test example $(x,y)$ such that $y = h^\star(x) + \xi$ where $\xi \in N(0,\sigma^2)$  
+
+$$
+\mathrm{MSE}(x) = \mathbb{E}_{S,\xi}[(y - h_S(x))^2]
+$$
+
+$$
+\begin{aligned}
+\mathrm{MSE}(x) = \mathbb{E}[(y - h_S(x))^2] &= \mathbb{E}[(\xi + (h^\star(x) - h_S(x)))^2] \\
+&= \mathbb{E}[\xi^2] + \mathbb{E}[(h^\star(x) - h_S(x))^2] \\
+&= \sigma^2 + \mathbb{E}[(h^\star(x) - h_S(x))^2]
+\end{aligned}
+$$
+
+Then, we define $h_{avg}(x) = E_S[h_S(x)]$ as the "average model"
+
+```math
+\begin{aligned}
+\mathrm{MSE}(x)
+&= \sigma^2 + \mathbb{E}\left[(h^\star(x)-h_S(x))^2\right] \\
+&= \sigma^2 + (h^\star(x)-h_{\mathrm{avg}}(x))^2
++ \mathbb{E}\left[(h_{\mathrm{avg}}(x)-h_S(x))^2\right] \\
+&= \underbrace{\sigma^2}_{\text{unavoidable}}
++ \underbrace{(h^\star(x)-h_{\mathrm{avg}}(x))^2}_{\triangleq\ \mathrm{bias}^2}
++ \underbrace{\mathrm{var}(h_S(x))}_{\triangleq\ \mathrm{variance}}.
+\end{aligned}
+```
+
+### 8.2 The double descent phenomenon
+In many cases, we empirically observe that the test error can have a second descent
+
+<img width="420" height="233" alt="image" src="https://github.com/user-attachments/assets/6db63d6d-3f80-4d9e-b60f-fc1b77ef4fec" />
