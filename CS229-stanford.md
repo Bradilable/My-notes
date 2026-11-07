@@ -608,13 +608,13 @@ $$
 
 # Part 2 Deep learning
 ## 7.1 Supervised learning with non-linear models
-Consider **regression problems**, we define the least square cost function for the $i$-th example as
+For **regression problems**, we define the least-squares cost function for the $i$-th example as
 
 $$
 J^{(i)}(\theta) = \frac{1}{2}(h_\theta(x^{(i)}) - y^{(i)})^2
 $$
 
-And the mean-square cost function for the dataset as  
+The mean-square cost function for the dataset is  
 
 $$
 J(\theta) = \frac{1}{n} \sum_{i=1}^n J^{(i)}(\theta)
@@ -641,7 +641,7 @@ $$
 J(\theta) = \frac{1}{n} \sum_{i=1}^n J^{(i)}(\theta)
 $$
 
-**Multi-class classification**
+**Multi-class classification**  
 We have the logits $\bar{h}_\theta : \mathbb{R}^d \to \mathbb{R}^k$
 
 $$
@@ -658,45 +658,45 @@ $$
 J(\theta) = \frac{1}{n} \sum_{i=1}^n J^{(i)}(\theta)
 $$
 
-**Optimizers(SGD)**
+**Optimizers (SGD)**
 
 <img width="496" height="164" alt="image" src="https://github.com/user-attachments/assets/c089fc75-c3dc-47b3-9c8f-8e94aedd710c" />
 
 <img width="488" height="209" alt="image" src="https://github.com/user-attachments/assets/21a31d5e-d2d8-410f-821e-997144c16fb2" />
 
 With all these generic algorithms, a typical deep learning model is learned with the following steps  
-(1)Define a neural network parametrization $h_{\theta}(x)$  
-(2)write the backpropagation algorithm to compute the gradient of the loss function $J^{(i)}(\theta)$ efficiently  
-(3)run SGD or mini-batch SGD with the loss function $J(\theta)$  
+(1) Define a neural network parametrization $h_{\theta}(x)$  
+(2) Write the backpropagation algorithm to compute the gradient of the loss function $J^{(i)}(\theta)$ efficiently  
+(3) Run SGD or mini-batch SGD with the loss function $J(\theta)$  
 ### 7.2 Neural networks  
 **Neural networks** refer to a broad type of non-linear models/parametrizations $\bar h_{\theta}(x)$ that involve combinations of matrix multiplications and other entrywise non-linear operations.  
-**A Nerual Network with a Single Neurom**  
+**A Neural Network with a Single Neuron**  
 
 $$
 \bar{h}_\theta(x) = \max(wx + b, 0), \text{ where } \theta = (w, b) \in \mathbb{R}^2
 $$
 
-The function max{$t,0$} is called a **ReLu**(rectified linear unit)  
+The function $\max(t,0)$ is called the **ReLU** (rectified linear unit)  
 Generally, a one-dimensional non-linear function that maps $\mathbb{R}$ to $\mathbb{R}$ such as ReLU is often referred to as an **activation function**  
 
 $$
 \bar{h}_\theta(x) = \text{ReLU}(w^\top x + b), \text{ where } w \in \mathbb{R}^d, b \in \mathbb{R}, \text{ and } \theta = (w, b)
 $$  
 
-**Stacking Neurons**
-A more complex neural network may take the single neuron described above and “stack” them together such that one neuron passes its output as input into the next neuron  
+**Stacking Neurons**  
+A more complex neural network may stack neurons so that the output of one neuron becomes the input to another  
 Formally, the input to a neural network is a set of input features $x_1 , x_2 , x_3 , x_4$  
 We call the intermediate variables **hidden units** or **hidden neurons**  
 **Two-layer Fully-Connected Neural Networks**  
-When all the interemediate variavbles depend on all th einputs, we call th enetwork **fully-connected neural network**  
-For example, a two-layer fully-connected neural network with $m$ hidden units and $d$ dimensional input $x \in {R}^d$ is defined as  
+When each hidden unit is connected to every input of its layer, we call the network a **fully connected neural network**  
+For example, a two-layer fully connected neural network with $m$ hidden units and $d$-dimensional input $x \in \mathbb{R}^d$ is defined as  
 
 $$
 \begin{aligned}
 \forall j \in [1, \dots, m], \quad z_j &= w_j^{[1]\top} x + b_j^{[1]} \text{ where } w_j^{[1]} \in \mathbb{R}^d, b_j^{[1]} \in \mathbb{R} \\
 a_j &= \text{ReLU}(z_j), \\
 a &= [a_1, \dots, a_m]^\top \in \mathbb{R}^m \\
-\bar{h}_\theta(x) &= w^{[2]\top} a + b^{[2]} \text{ where } w^{[2]} \in \mathbb{R}^m, b^{[2]} \in {R}
+\bar{h}_\theta(x) &= w^{[2]\top} a + b^{[2]} \text{ where } w^{[2]} \in \mathbb{R}^m, b^{[2]} \in \mathbb{R}
 \end{aligned}
 $$
 
@@ -722,10 +722,10 @@ z_1 \\ \vdots \\ \vdots \\ z_m
 =
 \underbrace{
 \begin{bmatrix}
--\, {w_1^{[1]}}^\top \,- \\
--\, {w_2^{[1]}}^\top \,- \\
+-\, w_1^{[1]\top} \,- \\
+-\, w_2^{[1]\top} \,- \\
 \vdots \\
--\, {w_m^{[1]}}^\top \,-
+-\, w_m^{[1]\top} \,-
 \end{bmatrix}
 }_{W^{[1]} \in \mathbb{R}^{m \times d}}
 \underbrace{
@@ -761,21 +761,21 @@ a^{[r-1]} &= \mathrm{ReLU}(W^{[r-1]}a^{[r-2]} + b^{[r-1]}) \\
 \end{aligned}
 $$
  
-The total number of neurons in the network is $m_1 + ··· + m_r$  
-The total number of parameters in the network is $(d+1)m_1 + (m_1 +1)m_2 + ··· + (m_{r-1}+1)m_r$  
-**Other activation functions**
-The activation function ReLU can be replaced by many other non-linear function $\sigma(·)$ that maps $R$ to $R$ such as  
+The total number of neurons in the network is $m_1 + \cdots + m_r$  
+The total number of parameters in the network is $(d+1)m_1 + (m_1 +1)m_2 + \cdots + (m_{r-1}+1)m_r$  
+**Other activation functions**  
+The activation function ReLU can be replaced by other nonlinear functions $\sigma(\cdot)$ that map $\mathbb{R}$ to $\mathbb{R}$, such as those below  
 
 <img width="332" height="180" alt="image" src="https://github.com/user-attachments/assets/a9edd20e-f34c-4580-8a1e-fbc6913f7c18" />
 
 
 <img width="411" height="220" alt="image" src="https://github.com/user-attachments/assets/3e2ce350-282e-4f1a-92e4-c03e6fdea5ae" />
 
-**Connection to the kernel method**
+**Connection to the kernel method**  
 The process of choosing the feature maps is often referred to as **feature engineering**  
-The penultimate layer $a[r]$ is often (informally) referred to as the **learned features** or representations in the context of deep learning  
+The penultimate layer $a^{[r-1]}$ is often (informally) referred to as the **learned features** or representations in the context of deep learning  
 ### 7.3 Modules in modern Neural Networks  
-The multi-layer neural network introduced above is often called **multi-layer perceptron**(MLP) these days  
+The multi-layer neural network introduced above is often called a **multilayer perceptron** (MLP)  
 
 $$
 \mathrm{MM}_{W,b}(z) = Wz + b
@@ -802,8 +802,8 @@ $$
 
 <img width="428" height="170" alt="image" src="https://github.com/user-attachments/assets/95b26db8-3abd-4cef-a93d-6774f419c2dd" />
 
-**Layer normalization**
-We first define a sub-module of the layer normalization, denoted by LN-S  
+**Layer normalization**  
+We first define a submodule of layer normalization, denoted by LN-S  
 
 $$
 \text{LN-S}(z) = \begin{bmatrix} 
@@ -814,7 +814,7 @@ $$
 \end{bmatrix}
 $$
 
-Often times zero mean and standard deviation 1 is not the most desired normalization scheme, and thus layernorm introduces to parameters learnable scalars $\beta$ and $\gamma$ as the desired mean and standard deviation  
+Layer normalization introduces two learnable scalars, $\beta$ and $\gamma$, to set the desired mean and standard deviation of the normalized activations (with $\gamma > 0$).  
 
 $$
 \text{LN}(z) = \beta + \gamma \cdot \text{LN-S}(z) = \begin{bmatrix} 
@@ -825,26 +825,26 @@ $$
 \end{bmatrix}
 $$
 
-$\beta$ and $\gamma$ are learnable parameters and thus layernorm is a parameterized module(as opposed to the activation layer which doesn't have any parameters)  
-Suppose we consider composing $LN$ with $MM_{W,b}$ and get a subnetwork $LN({MM_{W,b}})$
+$\beta$ and $\gamma$ are learnable parameters and thus layer normalization is a parameterized module, whereas the ReLU layer has no learnable parameters  
+Suppose we consider composing $\text{LN}$ with $\text{MM}_{W,b}$ to obtain the composition $\text{LN} \circ \text{MM}_{W,b}$
 
 $$
 \text{LN}(\text{MM}_{\alpha W, \alpha b}(z)) = \text{LN}(\text{MM}_{W,b}(z)), \forall \alpha > 0
 $$
 
-Obviously, this subnetwork is scaling-invariant  
-We also have other normalization layers, such as batch-normalization and group normalization  
+The subnetwork is invariant under positive rescaling of $W$ and $b$  
+We also have other normalization layers, such as batch normalization and group normalization  
 **Convolutional Layers**  
-We start by introducing a simplified version of the 1-D convolution layer, denoted by **Conv1D-S(·)** which is a type of matrix multiplication layer with a special structure  
-The parameters of Conv1D-S are a filter vector $\omega \in R^k$ where $k$ is called the **filter size**
+We start by introducing a simplified version of the 1-D convolution layer, denoted by **Conv1D-S**, which is a type of matrix multiplication layer with a special structure  
+The parameters of Conv1D-S are a filter vector $w \in \mathbb{R}^k$ where $k$ is called the **filter size**
 
 $$
 \text{Conv1D-S}(z)_i = w_1 z_{i-\ell} + w_2 z_{i-\ell+1} + \cdots + w_{2\ell+1} z_{i+\ell} = \sum_{j=1}^{2\ell+1} w_j z_{i-\ell+(j-1)}
 $$
 
 Computing the convolution only takes $O(km)$ time but computing a generic matrix multiplication takes $O(m^2)$  
-$\omega$ is called the **filter** or **kernel**  
-We can also view it as a matrix multiplicationwith shared parameters: $Conv1D-S(z) = Qz$, where
+$w$ is called the **filter** or **kernel**  
+We can also view it as a matrix multiplication with shared parameters, $\text{Conv1D-S}(z) = Qz$, where
 
 $$
 Q = \begin{bmatrix}
@@ -862,7 +862,7 @@ w_1 & \cdots & w_{\ell+1} & \cdots & \cdots & \cdots & w_{2\ell+1} & 0 & \cdots 
 $$
 
 Note that convolution is a matrix multiplication with shared parameters  
-The number of vectors that are inputed is referred to as the number of **channels**, we also have **output channels**  
+The number of input vectors is the number of **input channels**. The layer can also have multiple **output channels**.  
 
 $$
 \forall i \in [C'], \text{Conv1D}(z)_i = \sum_{j=1}^C \text{Conv1D-S}_{i,j}(z_j)
@@ -875,7 +875,7 @@ $$
 $$
 
 ### 7.4 Backpropagation
-Because the formality of the general theorem is not the main focus here, we will introduce the terms with informal definitions. By a differentiable circuit or a differentiable network, we mean a composition of a sequence of differentiable arithmetic operations (additions, subtraction, multiplication, divisions, etc) and elementary differentiable functions (ReLU, exp, log, sin, cos, etc.). Let the size of the circuit be the total number of such operations and elementary functions. We assume that each of the operations and functions, and their derivatives or partial derivatives ecan be computed in $O(1)$ time
+Because the formality of the general theorem is not the main focus here, we will introduce the terms with informal definitions. By a differentiable circuit or a differentiable network, we mean a composition of a sequence of differentiable arithmetic operations (addition, subtraction, multiplication, division, etc.) and elementary differentiable functions (exp, log, sin, cos, etc.). ReLU is differentiable away from zero. Let the size of the circuit be the total number of such operations and elementary functions. We assume that each of the operations and functions, and their derivatives or partial derivatives can be computed in $O(1)$ time
 
 $$
 \begin{aligned}
@@ -888,8 +888,8 @@ $$
 
 ### 7.5 Vectorization over training examples
 We hope to leverage the parallelism across the multiple examples  
-Assume that we have three examples $x_1, x_2, x_3$  
-The first-layer activations for each example are as follows
+Assume that we have three examples $x^{(1)}, x^{(2)}, x^{(3)}$  
+The first-layer preactivations for each example are as follows
 
 ```math
 \begin{aligned}
