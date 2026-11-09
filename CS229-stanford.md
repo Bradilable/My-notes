@@ -971,3 +971,37 @@ Then, we define $h_{avg}(x) = E_S[h_S(x)]$ as the "average model"
 In many cases, we empirically observe that the test error can have a second descent
 
 <img width="420" height="233" alt="image" src="https://github.com/user-attachments/assets/6db63d6d-3f80-4d9e-b60f-fc1b77ef4fec" />
+
+This phenomenon is known as **model-wise double descent** or **sample-wise double descent**  
+The peak of test error occurs when $n \approx d$  
+## Chapter 9 Regularization and model selection
+### 9.1 Regularization
+To do the regularization, we add a regularizer denoted by $R(\theta)$ to the training loss function  
+
+$$
+J_{\lambda}(\theta) = J(\theta)+ \lambda R(\theta)
+$$
+
+Here &\lambda& is called the regularization parameter  
+The most commonly used regularization is perhaps $l_2$ regularization, where $R(\theta) = \frac 1 2 \\| \theta \\|^2_2$  
+In deep learning, it's often referred to as **weight decay**  
+
+```math
+\begin{aligned}
+\theta &\leftarrow \theta - \eta \nabla J_{\lambda}(\theta)
+= \theta - \eta\lambda\theta - \eta \nabla J(\theta) \\
+&= \underbrace{(1-\lambda\eta)\theta}_{\text{decaying weights}}
+- \eta \nabla J(\theta)
+\end{aligned}
+```
+
+
+
+
+
+
+
+
+
+
+
