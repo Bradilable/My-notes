@@ -923,6 +923,7 @@ z^{[1](1)} & z^{[1](2)} & z^{[1](3)} \\
 
 
 # Part 3 Generalization and regularization
+## Chapter 8 Generalization
 The loss function for training purposes is oftentimes referred to as the **training loss**, while our ultimate goal is to minimize **test error**  
 
 $$
