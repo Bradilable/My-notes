@@ -1121,13 +1121,37 @@ In deep learning, it's often referred to as **weight decay**
 \end{aligned}
 ```
 
+Besides encouraging simpler models, regularization can also impose inductive biases or structures on the model parameters  
+The number of non-zeros in the ground-truth model parameters is oftentimes called **sparsity** of the model  
+The sparsity of the parameters is not a continuous function of the parameters, and thus we cannot optimize it with (stochastic) gradient descent. A common relaxation is to use $R(\theta) = \|\theta\|_1$ as a continuous surrogate
+### 9.2 Implicit regularization effect
+The implicit regularization effect of optimizers refers to that the optimizers can implicitly impose structures on parameters beyond what has been imposed by the regularized loss
+### 9.3 Model selection via cross validation
+Assume we have finite set of models $\mathcal{M}= \\{M_1,...,M_d\\}$  
+In **hold-out cross validation**(also called **simple cross validation**), we do the folloewing:  
 
+<img width="583" height="179" alt="image" src="https://github.com/user-attachments/assets/16c25c70-7d59-43de-8e40-11b0b1723894" />
 
+One may also retrain $M_i$ on the entire training set $S$ after step 3
+Another method is **$k$-fold cross validation**  
 
+<img width="586" height="246" alt="image" src="https://github.com/user-attachments/assets/b61772f2-d671-4a42-ac3a-622babd55109" />
 
+If $k=m$, the method is called **leave-one-out cross validation**
+### 9.4 Bayesian statistics and regularization
+Our former view of $\theta$ is taken in **frequentist** statistics, we can also approach our problem in the view of **Bayesian**
 
+$$
+\begin{aligned}
+p(\theta|S) &= \frac{p(S|\theta)p(\theta)}{p(S)} \\
+&= \frac{\left(\prod_{i=1}^n p(y^{(i)}|x^{(i)}, \theta)\right)p(\theta)}{\int_\theta \left(\prod_{i=1}^n p(y^{(i)}|x^{(i)}, \theta)p(\theta)\right) d\theta}
+\end{aligned}
+$$
 
+The **MAP(maximum a posteriori)** estimate for $\theta$ is given by
 
+$$
+\theta_{\text{MAP}} = \arg\max_{\theta} \prod_{i=1}^n p(y^{(i)}|x^{(i)}, \theta)p(\theta)
+$$
 
-
-
+# Part 4 Unsupervised learning
