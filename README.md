@@ -48,9 +48,12 @@
 
 ### [Part 3 Generalization and regularization](CS229-stanford.md#part-3-generalization-and-regularization)
 
-已包含训练损失、测试误差及过拟合与欠拟合的概述。
-
-- [8.1 Bias-variance tradeoff](CS229-stanford.md#81-bias-variance-tradeoff)（待补充）
+- [Chapter 8 Generalization](CS229-stanford.md#chapter-8-generalization)
+  - [8.1 Bias-variance tradeoff](CS229-stanford.md#81-bias-variance-tradeoff)
+  - [8.2 The double descent phenomenon](CS229-stanford.md#82-the-double-descent-phenomenon)
+  - [8.3 Sample complexity bounds](CS229-stanford.md#83-sample-complexity-bounds)
+- [Chapter 9 Regularization and model selection](CS229-stanford.md#chapter-9-regularization-and-model-selection)
+  - [9.1 Regularization](CS229-stanford.md#91-regularization)
 
 ## 数学公式与符号约定
 
