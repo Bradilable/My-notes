@@ -1,6 +1,6 @@
 # Part 1 Supervised Learning
 
-> Notation: $h_\theta$ denotes the hypothesis, $L$ the likelihood, $\ell = \log L$ the log-likelihood, and $J$ the cost (negative log-likelihood in Section 2.3). LWR uses scalar weights $w^{(i)}$; SVM uses a weight vector $w$ and bias $b$. Inline formulas use one dollar sign on each side. Most display formulas use two dollar signs on each side, on separate lines.
+> Notation: $h_\theta$ denotes the hypothesis, $L$ the likelihood, $\ell = \log L$ the log-likelihood, and $J$ the cost (negative log-likelihood in Section 2.3). LWR uses scalar weights $w^{(i)}$; SVM uses a weight vector $w$ and bias $b$. Inline formulas use one dollar sign on each side. Display formulas use two dollar signs on separate lines by default. Some multiline formulas use fenced math blocks for GitHub compatibility.
 
 ## Chapter 0 Basic concepts
 $x^{(i)}$ is called an input **feature** and $y^{(i)}$ is called a **target**  
@@ -25,7 +25,7 @@ $$
 
 This is the **ordinary least squares** regression model  
 ### 1.1 LMS algorithm
-We use the **gradient descent** to update $\theta$  
+We use **gradient descent** to update $\theta$  
 
 $$
 \theta_j := \theta_j - \alpha \frac{\partial}{\partial \theta_j} J(\theta).
@@ -37,8 +37,8 @@ $$
 \theta_j := \theta_j + \alpha \sum_{i=1}^{n} \left(y^{(i)} - h_\theta(x^{(i)})\right)x_j^{(i)}, \quad (\text{for every } j)
 $$
 
-This rule is called the **LMS**(stands for least mean squares) or the **Widrow-Hoff** learning rule  
-We rewrite in the form of vector  
+This rule is called the **LMS** (least mean squares) or the **Widrow-Hoff** learning rule  
+In vector form, the update is  
 
 $$
 \theta := \theta + \alpha \sum_{i=1}^{n} \left(y^{(i)} - h_\theta(x^{(i)})\right)x^{(i)}
@@ -52,7 +52,7 @@ $$
 \theta := \theta + \alpha \left(y^{(i)} - h_\theta(x^{(i)})\right)x^{(i)}
 $$
 
-In this algorithm, we repeatedly run through the training set, and each time we encounter a training example, we update the parameters according to the gradient of the error with respect to that single training example only. This algorithm is called **stochastic gradient descent**(also **incremental gradient descent**)  
+In this algorithm, we repeatedly run through the training set, and each time we encounter a training example, we update the parameters according to the gradient of the error with respect to that single training example only. This algorithm is called **stochastic gradient descent** (also **incremental gradient descent**)  
 Stochastic gradient descent often makes faster initial progress, but with a fixed learning rate it may keep fluctuating around a minimum. When the training set is large, stochastic gradient descent is often preferred  
 ### 1.2 The normal equations
 We define the derivative of $f$ with respect to $A$ to be:  
@@ -168,7 +168,7 @@ The figure on the left: underfitting, the figure on the right: overfitting
 
 <img width="470" height="131" alt="image" src="https://github.com/user-attachments/assets/43f40398-1b0a-4fb1-b513-a77dfd789ad8" />  
 
-One solution: using **locally weighted linear regression**(LWR) which works as follows:  
+One solution: using **locally weighted linear regression** (LWR) which works as follows:  
 1. For a query point $x$, fit $\theta$ to minimize $\sum_{i=1}^{n} w^{(i)}\left(y^{(i)}-\theta^T x^{(i)}\right)^2$.
 2. Output $\theta^T x$.
 
@@ -181,8 +181,8 @@ $$
 
 $\tau$ is called the **bandwidth** parameter  
 LWR is a sort of **non-parametric** algorithm, in contrast to (unweighted) linear regression, which is known as **parametric** algorithm  
-## Chapter 2 Classification and logistic regression  
-In this chapter we'll focus on the **binary classification**  
+## Chapter 2 Classification and logistic regression
+In this chapter we'll focus on **binary classification**  
 0 is called the negative class, 1 is called the positive class, $y$ given $x$ is also called the label
 ### 2.1 Logistic regression
 First of all we need to change our hypothesis to fit our question  
@@ -215,7 +215,7 @@ $$
 p(y \mid x; \theta) = (h_\theta(x))^y (1 - h_\theta(x))^{1-y}
 $$
 
-Assuming the n training examples were generated independently
+Assuming the $n$ training examples were generated independently
 
 $$
 \begin{aligned}
@@ -234,7 +234,7 @@ $$
 \ell(\theta) = \log L(\theta) = \sum_{i=1}^{n} \left[y^{(i)} \log h_\theta(x^{(i)}) + (1-y^{(i)}) \log\left(1-h_\theta(x^{(i)})\right)\right]
 $$
 
-Take its derivative we have the stochastic gradient ascent rule
+Taking the derivative of a single example's log-likelihood gives the stochastic gradient ascent rule
 
 $$
 \theta_j := \theta_j + \alpha \left(y^{(i)} - h_\theta(x^{(i)})\right)x_j^{(i)}
@@ -296,14 +296,14 @@ $$
 \frac{\partial \ell_{\mathrm{ce}}(t, y)}{\partial t_i} = \phi_i - \mathbf{1}\{y = i\}
 $$
 
-In vectorized notations it has the following form
+In vector form, the gradient is
 
 $$
-\frac{\partial \ell_{\mathrm{ce}}(t, y)}{\partial t} = \phi - e_y
+\nabla_t \ell_{\mathrm{ce}}(t, y) = \phi - e_y
 $$
 
 $$
-\frac{\partial J(\theta)}{\partial \theta_i} = \sum_{j=1}^n (\phi_i^{(j)} - \mathbf{1}\{y^{(j)} = i\}) \cdot x^{(j)}
+\nabla_{\theta_i} J(\theta) = \sum_{j=1}^n (\phi_i^{(j)} - \mathbf{1}\{y^{(j)} = i\}) \cdot x^{(j)}
 $$
 
 ### 2.4 Newton's method for maximizing log-likelihood
@@ -313,13 +313,13 @@ $$
 \theta := \theta - \frac{\ell'(\theta)}{\ell''(\theta)}
 $$
 
-generalize this to logistic regression, we get Newton–Raphson method
+For logistic regression with a vector parameter, the Newton–Raphson update is
 
 $$
 \theta := \theta - H^{-1} \nabla_\theta \ell(\theta)
 $$
 
-Where $H$ is the **Hessian**  
+Here $H$ is the **Hessian** of the log-likelihood  
 For logistic regression, Newton's method coincides with **Fisher scoring**
 ## Chapter 3 Generalized linear models
 ### 3.1 The exponential family
@@ -333,14 +333,14 @@ Here $\eta$ is called the **natural parameter**(also called the canonical parame
 It's easy to verify that Bernoulli and Gaussian distributions are examples of exponential family distributions  
 There’re many other distributions that are members of the exponential family: The multinomial, the Poisson, the gamma and the exponential, the beta and the Dirichlet...  
 ### 3.2 Constructing GLMs
-To derive a GLM model, we will make the following three assumptions:  
+To derive a GLM, we will make the following three assumptions:  
 1. $y|x;\theta \sim$ ExponentialFamily($\eta$)
 2. $h_\theta(x) = \mathrm{E}[y \mid x;\theta]$
 3. $\eta$ and $x$ are related linearly: $\eta = \theta^T x$
 The target variable $y$ is also called **response variable** in GLM terminology
 ## Chapter 4 Generative learning algorithms
 Algorithms that try to learn $p(y|x)$ directly are called **discriminative** learning algorithms, algorithms that instead try to model $p(x|y)$ are called **generative** learning algorithms  
-After modeling $p(y)$ and $p(x|y)$, we can use Bayes rule to derive the posterior distribution 
+After modeling $p(y)$ and $p(x|y)$, we can use Bayes' rule to derive the posterior distribution 
 
 $$
 p(y|x) = \frac{p(x|y)p(y)}{p(x)}
@@ -392,7 +392,7 @@ $$
 $$
 
 We call the map $\phi$ as **feature map**, the original input $x$ are called the **attributes**, the new quantities are called **features**
-### 5.2 LMS with features  
+### 5.2 LMS with features
 Replace all the occurrences of $x^{(i)}$ in the algorithm by $\phi(x^{(i)})$ give us the new update  
 
 $$
@@ -463,11 +463,11 @@ $$
 K(x, z) = \exp \left( -\frac{\|x - z\|^2}{2\sigma^2} \right)
 $$
 
-The necessary and sufficient condition for $K$ to be a valid kernel(also called a **Mercer kernel**)  
+The necessary and sufficient condition for $K$ to be a valid kernel (also called a **Mercer kernel**)  
 
 <img width="504" height="78" alt="image" src="https://github.com/user-attachments/assets/45457809-3718-4c36-bef7-d0f867eba735" />
 
-## Chapter 6 Support vector machines  
+## Chapter 6 Support vector machines
 ### 6.1 Margins: intuition
 The decision boundary given by the equation $\theta^{T}x = 0$ is called the **separating hyperplane** 
 
@@ -476,7 +476,7 @@ The decision boundary given by the equation $\theta^{T}x = 0$ is called the **se
 We see that if a point is far from the separating hyperplane, then we may be significantly more confident in our predictions  
 Informally we think it would be nice if, given a training set, we manage to find a decision boundary that
 allows us to make all correct and confident predictions on the training examples  
-### 6.2 Notation  
+### 6.2 Notation
 We now use $y \in \lbrace -1, 1 \rbrace$ (instead of $\lbrace 0, 1 \rbrace$)  
 Rather than parameterizing our linear classifier with the vector $\theta$, we write our classifier as
 
@@ -495,7 +495,7 @@ $$
 
 We see that by scaling $w$ and $b$ by the same positive factor we can make the functional margin arbitrarily large without really changing anything meaningful  
 For $w \ne 0$, we do the normalization by replacing ($w$, $b$) with $(w / \|w\|_2, b / \|w\|_2)$  
-For a training set $S = \{(x^{(i)},y^{(i)}); i = 1,...,n \}$, we also define the functional margin of ($w$, $b$) with respect to $S$ as the smallest of the functional margins of the individual training examples as follows
+For a training set $S = \lbrace (x^{(i)},y^{(i)}) \mid i = 1,\ldots,n \rbrace$, we also define the functional margin of ($w$, $b$) with respect to $S$ as the smallest of the functional margins of the individual training examples as follows
 
 $$
 \hat{\gamma} = \min_{i=1,\dots,n} \hat{\gamma}^{(i)}
@@ -553,7 +553,7 @@ $$
 \end{aligned}
 $$
 
-The solution gives us the **optimal margin classifier**, this optimization problem can be solved using commercial quadratic programming(QP) code
+The solution gives us the **optimal margin classifier**, this optimization problem can be solved using commercial quadratic programming (QP) code
 ### 6.5 Lagrange duality
 Consider a problem of the following form:
 
@@ -594,7 +594,7 @@ $$
 $$
 
 $$
-\theta_{\mathcal{P}}(w) = \max_{\alpha, \beta : \alpha_i \ge 0} \mathcal{L}(w, \alpha, \beta)
+\theta_{\mathcal{P}}(w) = \sup_{\alpha, \beta : \alpha_i \ge 0} \mathcal{L}(w, \alpha, \beta)
 $$
 
 We use $\theta_{\mathcal{P}}$ as a constraint criterion (distinct from the regression parameter $\theta$)
@@ -669,7 +669,7 @@ With all these generic algorithms, a typical deep learning model is learned with
 (1) Define a neural network parametrization $h_{\theta}(x)$  
 (2) Write the backpropagation algorithm to compute the gradient of the loss function $J^{(i)}(\theta)$ efficiently  
 (3) Run SGD or mini-batch SGD with the loss function $J(\theta)$  
-### 7.2 Neural networks  
+### 7.2 Neural networks
 **Neural networks** refer to a broad type of non-linear models/parametrizations $\bar h_{\theta}(x)$ that involve combinations of matrix multiplications and other entrywise non-linear operations.  
 **A Neural Network with a Single Neuron**  
 
@@ -682,7 +682,7 @@ Generally, a one-dimensional non-linear function that maps $\mathbb{R}$ to $\mat
 
 $$
 \bar{h}_\theta(x) = \text{ReLU}(w^\top x + b), \text{ where } w \in \mathbb{R}^d, b \in \mathbb{R}, \text{ and } \theta = (w, b)
-$$  
+$$
 
 **Stacking Neurons**  
 A more complex neural network may stack neurons so that the output of one neuron becomes the input to another  
@@ -694,7 +694,7 @@ For example, a two-layer fully connected neural network with $m$ hidden units an
 
 $$
 \begin{aligned}
-\forall j \in [1, \dots, m], \quad z_j &= w_j^{[1]\top} x + b_j^{[1]} \text{ where } w_j^{[1]} \in \mathbb{R}^d, b_j^{[1]} \in \mathbb{R} \\
+\forall j \in \lbrace 1,\ldots,m \rbrace, \quad z_j &= w_j^{[1]\top} x + b_j^{[1]} \text{ where } w_j^{[1]} \in \mathbb{R}^d, b_j^{[1]} \in \mathbb{R} \\
 a_j &= \text{ReLU}(z_j), \\
 a &= [a_1, \dots, a_m]^\top \in \mathbb{R}^m \\
 \bar{h}_\theta(x) &= w^{[2]\top} a + b^{[2]} \text{ where } w^{[2]} \in \mathbb{R}^m, b^{[2]} \in \mathbb{R}
@@ -706,10 +706,10 @@ We define a weight matrix in the following way
 $$
 W^{[1]} =
 \begin{bmatrix}
--\, {w_1^{[1]}}^\top \,- \\
--\, {w_2^{[1]}}^\top \,- \\
+-\, w_1^{[1]\top} \,- \\
+-\, w_2^{[1]\top} \,- \\
 \vdots \\
--\, {w_m^{[1]}}^\top \,-
+-\, w_m^{[1]\top} \,-
 \end{bmatrix}
 \in \mathbb{R}^{m \times d}
 $$
@@ -775,7 +775,7 @@ The activation function ReLU can be replaced by other nonlinear functions $\sigm
 **Connection to the kernel method**  
 The process of choosing the feature maps is often referred to as **feature engineering**  
 The penultimate layer $a^{[r-1]}$ is often (informally) referred to as the **learned features** or representations in the context of deep learning  
-### 7.3 Modules in modern Neural Networks  
+### 7.3 Modules in modern Neural Networks
 The multi-layer neural network introduced above is often called a **multilayer perceptron** (MLP)  
 
 $$
@@ -787,7 +787,7 @@ $$
 $$
 
 $$
-\text{MLP}(x) = \text{MM}(\sigma(\text{MM}\sigma(\cdots \text{MM}(x))))
+\text{MLP}(x) = (\text{MM}\circ\sigma\circ\text{MM}\circ\sigma\circ\cdots\circ\text{MM})(x)
 $$
 
 **Residual connection**
@@ -797,7 +797,7 @@ $$
 $$
 
 $$
-\text{ResNet-S}(x) = \text{MM}(\text{Res}(\text{Res}(\cdots \text{Res}(x))))
+\text{ResNet-S}(x) = (\text{MM}\circ\text{Res}\circ\cdots\circ\text{Res})(x)
 $$
 
 
@@ -818,7 +818,7 @@ $$
 Layer normalization introduces two learnable scalars, $\beta$ and $\gamma$, to set the desired mean and standard deviation of the normalized activations (with $\gamma > 0$).  
 
 $$
-\text{LN}(z) = \beta + \gamma \cdot \text{LN-S}(z) = \begin{bmatrix} 
+\text{LN}(z) = \beta\mathbf{1} + \gamma \cdot \text{LN-S}(z) = \begin{bmatrix} 
 \beta + \gamma \left( \frac{z_1 - \hat{\mu}}{\hat{\sigma}} \right) \\ 
 \beta + \gamma \left( \frac{z_2 - \hat{\mu}}{\hat{\sigma}} \right) \\ 
 \vdots \\ 
@@ -837,7 +837,7 @@ The subnetwork is invariant under positive rescaling of $W$ and $b$
 We also have other normalization layers, such as batch normalization and group normalization  
 **Convolutional Layers**  
 We start by introducing a simplified version of the 1-D convolution layer, denoted by **Conv1D-S**, which is a type of matrix multiplication layer with a special structure  
-The parameters of Conv1D-S are a filter vector $w \in \mathbb{R}^k$ where $k$ is called the **filter size**
+The parameters of Conv1D-S are a filter vector $w \in \mathbb{R}^k$ where $k=2\ell+1$ is the **filter size**. Input indices outside the vector are zero-padded.
 
 $$
 \text{Conv1D-S}(z)_i = w_1 z_{i-\ell} + w_2 z_{i-\ell+1} + \cdots + w_{2\ell+1} z_{i+\ell} = \sum_{j=1}^{2\ell+1} w_j z_{i-\ell+(j-1)}
@@ -919,7 +919,7 @@ Z^{[1]} =
 z^{[1](1)} & z^{[1](2)} & z^{[1](3)} \\
 \vert & \vert & \vert
 \end{bmatrix}
-= W^{[1]}X + b^{[1]}
+= W^{[1]}X + b^{[1]}\mathbf{1}_3^\top
 ```
 
 
@@ -928,20 +928,20 @@ z^{[1](1)} & z^{[1](2)} & z^{[1](3)} \\
 The loss function for training purposes is oftentimes referred to as the **training loss**, while our ultimate goal is to minimize **test error**  
 
 $$
-L(\theta) = \mathbb{E}_{(x,y) \sim \mathcal{D}}[(y - h_\theta(x))^2]
+L_{\mathrm{test}}(\theta) = \mathbb{E}_{(x,y) \sim \mathcal{D}}[(y - h_\theta(x))^2]
 $$
 
 Here $\mathcal{D}$ denotes the **test distribution**  
 We typically say the model **overfits** the data if the model predicts accurately on the training dataset but doesn’t generalize well to other test examples, that is, if the training error is small but the test error is large. We say the model **underfits** the data if the training error is relatively large(and in this case, typically the test error is also relatively large.)  
-### 8.1 Bias-variance tradeoff  
+### 8.1 Bias-variance tradeoff
 Informally, we define the **bias** of a model to be the test error even if we were to fit it to a very (say, infinitely) large training dataset  
 The **variance** can be intuitively characterized by the amount of variations across models learnt on multiple different training datasets (drawn from the same underlying distribution)  
 Often, there is a tradeoff between the bias and variance  
 To formally state the bias-variance tradeoff for regression problems, we consider the following setup  
 
-Draw a training dataset $S = \\{x^{(i)}, y^{(i)} \\}^{n}_{i=1}$ such that $y^{(i)} = h^\star(x^{(i)}) + \xi^{(i)}$ where $\xi^{(i)} \in N(0,\sigma^2)$  
-Train a model on the dataset $S$, denoted by $\hat h_S$  
-Take a test example $(x,y)$ such that $y = h^\star(x) + \xi$ where $\xi \in N(0,\sigma^2)$  
+Draw a training dataset $S = \lbrace (x^{(i)}, y^{(i)}) \rbrace_{i=1}^{n}$ such that $y^{(i)} = h^\star(x^{(i)}) + \xi^{(i)}$ where $\xi^{(i)} \sim \mathcal{N}(0,\sigma^2)$  
+Train a model on the dataset $S$, denoted by $h_S$  
+Take a test example $(x,y)$ such that $y = h^\star(x) + \xi$ where $\xi \sim \mathcal{N}(0,\sigma^2)$ is independent of the training set $S$  
 
 $$
 \mathrm{MSE}(x) = \mathbb{E}_{S,\xi}[(y - h_S(x))^2]
@@ -955,7 +955,7 @@ $$
 \end{aligned}
 $$
 
-Then, we define $h_{avg}(x) = E_S[h_S(x)]$ as the "average model"
+Then, we define $h_{\mathrm{avg}}(x) = \mathbb{E}_S[h_S(x)]$ as the "average model"
 
 ```math
 \begin{aligned}
@@ -1008,13 +1008,13 @@ $$
 \hat{\theta} = \arg\min_{\theta} \hat{\varepsilon}(h_\theta)
 $$
 
-We difine the **hypothesis class $\mathcal H$** so that ERM goes like  
+We define the **hypothesis class $\mathcal{H}$** so that ERM goes like  
 
 $$
 \hat{h} = \arg\min_{h \in \mathcal{H}} \hat{\varepsilon}(h)
 $$
 
-Take any one, fixed, $h_i \in \mathcal{H}$  
+For a fixed $h_i \in \mathcal{H}$, let $Z_j$ be the indicator that $h_i$ misclassifies training example $j$.  
 
 $$
 \hat{\varepsilon}(h_i) = \frac{1}{n} \sum_{j=1}^n Z_j
@@ -1024,11 +1024,11 @@ $$
 P(|\varepsilon(h_i) - \hat{\varepsilon}(h_i)| > \gamma) \le 2 \exp(-2\gamma^2 n)
 $$
 
-Let $A_i$ denote the event that $|\varepsilon(h_i) - \hat{\varepsilon}(h_i)| > \gamma)$
+Let $A_i$ denote the event that $|\varepsilon(h_i) - \hat{\varepsilon}(h_i)| > \gamma$
 
 $$
 \begin{aligned}
-P(\exists h \in \mathcal{H}. |\varepsilon(h_i) - \hat{\varepsilon}(h_i)| > \gamma) &= P(A_1 \cup \dots \cup A_k) \\
+P(\exists h \in \mathcal{H}:\ |\varepsilon(h) - \hat{\varepsilon}(h)| > \gamma) &= P(A_1 \cup \dots \cup A_k) \\
 &\le \sum_{i=1}^k P(A_i) \\
 &\le \sum_{i=1}^k 2 \exp(-2\gamma^2 n) \\
 &= 2k \exp(-2\gamma^2 n)
@@ -1037,7 +1037,7 @@ $$
 
 $$
 \begin{aligned}
-P(\neg\exists h \in \mathcal{H}. |\varepsilon(h_i) - \hat{\varepsilon}(h_i)| > \gamma) &= P(\forall h \in \mathcal{H}. |\varepsilon(h_i) - \hat{\varepsilon}(h_i)| \le \gamma) \\
+P(\neg\exists h \in \mathcal{H}:\ |\varepsilon(h) - \hat{\varepsilon}(h)| > \gamma) &= P(\forall h \in \mathcal{H}:\ |\varepsilon(h) - \hat{\varepsilon}(h)| \le \gamma) \\
 &\ge 1 - 2k \exp(-2\gamma^2 n)
 \end{aligned}
 $$
@@ -1049,8 +1049,8 @@ $$
 n \ge \frac{1}{2\gamma^2} \log \frac{2k}{\delta}
 $$
 
-The training set size $n$ that a certain method oralgorithm requires in order to achieve a certain level of performance is also called the algorithm’s **sample complexity**  
-Define $h^* = \arg \min_{h \in \mathcal{H}} \varepsilon(h)$ to be the best possible hypothesis in $\mathcal{H}$
+The training set size $n$ that a certain method or algorithm requires in order to achieve a certain level of performance is also called the algorithm’s **sample complexity**  
+Define $h^* = \arg\min_{h \in \mathcal{H}} \varepsilon(h)$ to be the best possible hypothesis in $\mathcal{H}$
 
 ```math
 \begin{aligned}
@@ -1081,22 +1081,22 @@ $$
 
 Now we'll consider the case of infinite $\mathcal{H}$  
 in order to learn “well” using a hypothesis class that has $d$ parameters, generally we’re going to need on the order of a linear number of training examples in $d$  
-Given a hypothesis class $\mathcal{H}$, we then define it's **Vapnik-Chervonenkis dimension**, written $VC(\mathcal{H})$, to be the size of the largest set that is shattered by $\mathcal{H}$
+Given a hypothesis class $\mathcal{H}$, we then define its **Vapnik-Chervonenkis dimension**, written $VC(\mathcal{H})$, to be the size of the largest set that is shattered by $\mathcal{H}$
 
 $$
 \begin{aligned}
-& \textbf{Theorem.} \text{ Let } \mathcal{H} \text{ be given, and let } \mathbf{D} = \text{VC}(\mathcal{H}). \text{ Then with probability at} \\
+& \textbf{Theorem.} \text{ Let } \mathcal{H} \text{ be given, and let } D = \text{VC}(\mathcal{H}). \text{ Then with probability at} \\
 & \text{least } 1 - \delta, \text{ we have that for all } h \in \mathcal{H}, \\
-& \qquad\qquad\qquad\qquad |\varepsilon(h) - \hat{\varepsilon}(h)| \le O\left( \sqrt{\frac{\mathbf{D}}{n} \log \frac{n}{\mathbf{D}}} + \frac{1}{n} \log \frac{1}{\delta} \right). \\
+& \qquad\qquad\qquad\qquad |\varepsilon(h) - \hat{\varepsilon}(h)| \le O\left( \sqrt{\frac{D}{n} \log \frac{n}{D} + \frac{1}{n} \log \frac{1}{\delta}} \right). \\
 & \text{Thus, with probability at least } 1 - \delta, \text{ we also have that:} \\
-& \qquad\qquad\qquad\qquad \varepsilon(\hat{h}) \le \varepsilon(h^*) + O\left( \sqrt{\frac{\mathbf{D}}{n} \log \frac{n}{\mathbf{D}}} + \frac{1}{n} \log \frac{1}{\delta} \right).
+& \qquad\qquad\qquad\qquad \varepsilon(\hat{h}) \le \varepsilon(h^*) + O\left( \sqrt{\frac{D}{n} \log \frac{n}{D} + \frac{1}{n} \log \frac{1}{\delta}} \right).
 \end{aligned}
 $$
 
 $$
 \begin{aligned}
 & \textbf{Corollary.} \text{ For } |\varepsilon(h) - \hat{\varepsilon}(h)| \le \gamma \text{ to hold for all } h \in \mathcal{H} \text{ (and hence } \varepsilon(\hat{h}) \le \\
-& \varepsilon(h^*) + 2\gamma) \text{ with probability at least } 1 - \delta, \text{ it suffices that } n = O_{\gamma,\delta}(\mathbf{D}).
+& \varepsilon(h^*) + 2\gamma) \text{ with probability at least } 1 - \delta, \text{ it suffices that } n = O_{\gamma,\delta}(D).
 \end{aligned}
 $$
 
@@ -1109,7 +1109,7 @@ J_{\lambda}(\theta) = J(\theta)+ \lambda R(\theta)
 $$
 
 Here $\lambda$ is called the regularization parameter  
-The most commonly used regularization is perhaps $l_2$ regularization, where $R(\theta) = \frac 1 2 \\| \theta \\|^2_2$  
+The most commonly used regularization is perhaps $\ell_2$ regularization, where $R(\theta) = \frac{1}{2} \lVert \theta \rVert_2^2$  
 In deep learning, it's often referred to as **weight decay**  
 
 ```math
