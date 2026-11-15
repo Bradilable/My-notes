@@ -607,7 +607,8 @@ f(w) & \text{if } w \text{ satisfies primal constraints} \\
 $$
 
 # Part 2 Deep learning
-## 7.1 Supervised learning with non-linear models
+## Chapter 7 Deep learning
+### 7.1 Supervised learning with non-linear models
 For **regression problems**, we define the least-squares cost function for the $i$-th example as
 
 $$
