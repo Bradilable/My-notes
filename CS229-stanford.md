@@ -936,7 +936,7 @@ We typically say the model **overfits** the data if the model predicts accuratel
 Informally, we define the **bias** of a model to be the test error even if we were to fit it to a very (say, infinitely) large training dataset  
 The **variance** can be intuitively characterized by the amount of variations across models learnt on multiple different training datasets (drawn from the same underlying distribution)  
 Often, there is a tradeoff between the bias and variance  
-To formally state the bias-variance tradeo↵ for regression problems, we consider the following setup  
+To formally state the bias-variance tradeoff for regression problems, we consider the following setup  
 
 Draw a training dataset $S = \\{x^{(i)}, y^{(i)} \\}^{n}_{i=1}$ such that $y^{(i)} = h^\star(x^{(i)}) + \xi^{(i)}$ where $\xi^{(i)} \in N(0,\sigma^2)$  
 Train a model on the dataset $S$, denoted by $\hat h_S$  
@@ -975,6 +975,130 @@ In many cases, we empirically observe that the test error can have a second desc
 
 This phenomenon is known as **model-wise double descent** or **sample-wise double descent**  
 The peak of test error occurs when $n \approx d$  
+### 8.3 Sample complexity bounds
+We start with two simple lemmas  
+**Lemma 1** Let $A_1, A_2,...,A_k$ be $k$ different events, then  
+
+$$
+P(A_1 \cup \dots \cup A_k) \le P(A_1) + \dots + P(A_k)
+$$
+
+**Lemma 2**(Hoeffding inequality) Let $Z_1,Z_2,...,Z_n$ be $n$ iid random variables drawn from a Bernoulli($\phi$) distribution, let $\hat \phi$ be the mean of the variables, for any $\gamma > 0$
+
+$$
+P(|\phi - \hat{\phi}| > \gamma) \le 2 \exp(-2\gamma^2 n)
+$$
+
+For a hypothesis $h$, we define the **training error**(also called the **empirical risk** or **empirical error** in learning theory) to be  
+
+$$
+\hat{\varepsilon}(h) = \frac{1}{n} \sum_{i=1}^n 1\{h(x^{(i)}) \neq y^{(i)}\}
+$$
+
+We also define the generalization error to be  
+
+$$
+\varepsilon(h) = P_{(x,y) \sim \mathcal{D}}(h(x) \neq y)
+$$
+
+The **empirical risk minimization**(ERM) is to pick  
+
+$$
+\hat{\theta} = \arg\min_{\theta} \hat{\varepsilon}(h_\theta)
+$$
+
+We difine the **hypothesis class $\mathcal H$** so that ERM goes like  
+
+$$
+\hat{h} = \arg\min_{h \in \mathcal{H}} \hat{\varepsilon}(h)
+$$
+
+Take any one, fixed, $h_i \in \mathcal{H}$  
+
+$$
+\hat{\varepsilon}(h_i) = \frac{1}{n} \sum_{j=1}^n Z_j
+$$
+
+$$
+P(|\varepsilon(h_i) - \hat{\varepsilon}(h_i)| > \gamma) \le 2 \exp(-2\gamma^2 n)
+$$
+
+Let $A_i$ denote the event that $|\varepsilon(h_i) - \hat{\varepsilon}(h_i)| > \gamma)$
+
+$$
+\begin{aligned}
+P(\exists h \in \mathcal{H}. |\varepsilon(h_i) - \hat{\varepsilon}(h_i)| > \gamma) &= P(A_1 \cup \dots \cup A_k) \\
+&\le \sum_{i=1}^k P(A_i) \\
+&\le \sum_{i=1}^k 2 \exp(-2\gamma^2 n) \\
+&= 2k \exp(-2\gamma^2 n)
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+P(\neg\exists h \in \mathcal{H}. |\varepsilon(h_i) - \hat{\varepsilon}(h_i)| > \gamma) &= P(\forall h \in \mathcal{H}. |\varepsilon(h_i) - \hat{\varepsilon}(h_i)| \le \gamma) \\
+&\ge 1 - 2k \exp(-2\gamma^2 n)
+\end{aligned}
+$$
+
+This is called a **uniform convergence** result  
+So given some $\delta > 0$, if we want to guarantee that with probability at least $1-\delta$, training error will be within $\gamma$ of generalization error  
+
+$$
+n \ge \frac{1}{2\gamma^2} \log \frac{2k}{\delta}
+$$
+
+The training set size $n$ that a certain method oralgorithm requires in order to achieve a certain level of performance is also called the algorithm’s **sample complexity**  
+Define $h^* = \arg \min_{h \in \mathcal{H}} \varepsilon(h)$ to be the best possible hypothesis in $\mathcal{H}$
+
+```math
+\begin{aligned}
+\varepsilon(\hat{h}) &\le \hat{\varepsilon}(\hat{h}) + \gamma \\
+&\le \hat{\varepsilon}(h^{\ast}) + \gamma \\
+&\le \varepsilon(h^{\ast}) + 2\gamma
+\end{aligned}
+```
+
+$$
+\begin{aligned}
+& \textbf{Theorem.} \text{ Let } |\mathcal{H}| = k, \text{ and let any } n, \delta \text{ be fixed. Then with probability at} \\
+& \text{least } 1 - \delta, \text{ we have that} \\
+& \qquad\qquad\qquad\qquad \varepsilon(\hat{h}) \le \left( \min_{h \in \mathcal{H}} \varepsilon(h) \right) + 2 \sqrt{\frac{1}{2n} \log \frac{2k}{\delta}}.
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+& \textbf{Corollary.} \text{ Let } |\mathcal{H}| = k, \text{ and let any } \delta, \gamma \text{ be fixed. Then for } \varepsilon(\hat{h}) \le \\
+& \min_{h \in \mathcal{H}} \varepsilon(h) + 2\gamma \text{ to hold with probability at least } 1 - \delta, \text{ it suffices that} \\
+& \qquad \begin{aligned}
+n &\ge \frac{1}{2\gamma^2} \log \frac{2k}{\delta} \\
+&= O\left( \frac{1}{\gamma^2} \log \frac{k}{\delta} \right),
+\end{aligned}
+\end{aligned}
+$$
+
+Now we'll consider the case of infinite $\mathcal{H}$  
+in order to learn “well” using a hypothesis class that has $d$ parameters, generally we’re going to need on the order of a linear number of training examples in $d$  
+Given a hypothesis class $\mathcal{H}$, we then define it's **Vapnik-Chervonenkis dimension**, written $VC(\mathcal{H})$, to be the size of the largest set that is shattered by $\mathcal{H}$
+
+$$
+\begin{aligned}
+& \textbf{Theorem.} \text{ Let } \mathcal{H} \text{ be given, and let } \mathbf{D} = \text{VC}(\mathcal{H}). \text{ Then with probability at} \\
+& \text{least } 1 - \delta, \text{ we have that for all } h \in \mathcal{H}, \\
+& \qquad\qquad\qquad\qquad |\varepsilon(h) - \hat{\varepsilon}(h)| \le O\left( \sqrt{\frac{\mathbf{D}}{n} \log \frac{n}{\mathbf{D}}} + \frac{1}{n} \log \frac{1}{\delta} \right). \\
+& \text{Thus, with probability at least } 1 - \delta, \text{ we also have that:} \\
+& \qquad\qquad\qquad\qquad \varepsilon(\hat{h}) \le \varepsilon(h^*) + O\left( \sqrt{\frac{\mathbf{D}}{n} \log \frac{n}{\mathbf{D}}} + \frac{1}{n} \log \frac{1}{\delta} \right).
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+& \textbf{Corollary.} \text{ For } |\varepsilon(h) - \hat{\varepsilon}(h)| \le \gamma \text{ to hold for all } h \in \mathcal{H} \text{ (and hence } \varepsilon(\hat{h}) \le \\
+& \varepsilon(h^*) + 2\gamma) \text{ with probability at least } 1 - \delta, \text{ it suffices that } n = O_{\gamma,\delta}(\mathbf{D}).
+\end{aligned}
+$$
+
 ## Chapter 9 Regularization and model selection
 ### 9.1 Regularization
 To do the regularization, we add a regularizer denoted by $R(\theta)$ to the training loss function  
@@ -983,7 +1107,7 @@ $$
 J_{\lambda}(\theta) = J(\theta)+ \lambda R(\theta)
 $$
 
-Here &\lambda& is called the regularization parameter  
+Here $\lambda$ is called the regularization parameter  
 The most commonly used regularization is perhaps $l_2$ regularization, where $R(\theta) = \frac 1 2 \\| \theta \\|^2_2$  
 In deep learning, it's often referred to as **weight decay**  
 
