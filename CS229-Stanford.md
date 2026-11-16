@@ -1233,3 +1233,171 @@ $$
 
 <img width="589" height="123" alt="image" src="https://github.com/user-attachments/assets/2865df4f-7b76-4ff1-8c90-a975cc16f232" />
 
+### 11.3 General EM algorithms
+Suppose we have an estimate problem in which we have a training set $\\{ x_{(1)},...,x_{(n)} \\}$ consisting of $n$ independent examples and we have our latent variable model $p(x,z;\theta)$  
+
+$$
+p(x; \theta) = \sum_{z} p(x, z; \theta)
+$$
+
+We wnat to maximize the log likelihood  
+
+$$
+\begin{aligned}
+\ell(\theta) &= \sum_{i=1}^n \log p(x^{(i)}; \theta) \\
+&= \sum_{i=1}^n \log \sum_{z^{(i)}} p(x^{(i)}, z^{(i)}; \theta)
+\end{aligned}
+$$
+
+We first focus on optimizing the likelihood for a single example  
+
+$$
+\log p(x; \theta) = \log \sum_{z} p(x, z; \theta)
+$$
+
+Let $Q$ be a distribution over the possible values of $z$  
+
+$$
+\begin{aligned}
+\log p(x; \theta) &= \log \sum_z p(x, z; \theta) \\
+&= \log \sum_z Q(z) \frac{p(x, z; \theta)}{Q(z)} \\
+&\ge \sum_z Q(z) \log \frac{p(x, z; \theta)}{Q(z)}
+\end{aligned}
+$$
+
+In order to make the lower bound tight at that value of $\theta$, we hope the Jensen's inequality could hold with equality at $\theta$, which requires  
+
+$$
+\frac{p(x, z; \theta)}{Q(z)} = c
+$$
+
+$$
+Q(z) \propto p(x, z; \theta)
+$$
+
+$$
+\begin{aligned}
+Q(z) &= \frac{p(x, z; \theta)}{\sum_z p(x, z; \theta)} \\
+&= \frac{p(x, z; \theta)}{p(x; \theta)} \\
+&= p(z|x; \theta)
+\end{aligned}
+$$
+
+So we set $Q$'s to be the posterior distribution of $z$'s given $x$  
+
+$$
+\begin{aligned}
+\sum_z Q(z) \log \frac{p(x, z; \theta)}{Q(z)} &= \sum_z p(z|x; \theta) \log \frac{p(x, z; \theta)}{p(z|x; \theta)} \\
+&= \sum_z p(z|x; \theta) \log \frac{p(z|x; \theta)p(x; \theta)}{p(z|x; \theta)} \\
+&= \sum_z p(z|x; \theta) \log p(x; \theta) \\
+&= \log p(x; \theta) \sum_z p(z|x; \theta) \\
+&= \log p(x; \theta)
+\end{aligned}
+$$
+
+We call this expression the **evidence lower bound(ELBO)**
+
+$$
+\text{ELBO}(x; Q, \theta) = \sum_z Q(z) \log \frac{p(x, z; \theta)}{Q(z)}
+$$
+
+$$
+\forall Q, \theta, x, \quad \log p(x; \theta) \ge \text{ELBO}(x; Q, \theta)
+$$
+
+So the EM algorithm will first set $Q(z) = p(z|x;\theta)$ and then maximize ELMO w.r.t $\theta$ while fixing the choice of $Q$  
+Now we can back to the multiple training examples and make EM algorithm formal  
+We have $n$ distributions $Q_1,...,Q_n$, one for each example $x_{(i)}$  
+
+$$
+\log p(x^{(i)}; \theta) \ge \text{ELBO}(x^{(i)}; Q_i, \theta) = \sum_{z^{(i)}} Q_i(z^{(i)}) \log \frac{p(x^{(i)}, z^{(i)}; \theta)}{Q_i(z^{(i)})}
+$$
+
+$$
+\begin{aligned}
+\ell(\theta) &\ge \sum_i \text{ELBO}(x^{(i)}; Q_i, \theta) \\
+&= \sum_i \sum_{z^{(i)}} Q_i(z^{(i)}) \log \frac{p(x^{(i)}, z^{(i)}; \theta)}{Q_i(z^{(i)})}
+\end{aligned}
+$$
+
+Repeat until convergence{
+
+    (E-step) for each i,set
+
+$$
+Q_i(z^{(i)}) := p(z^{(i)}|x^{(i)}; \theta)
+$$
+
+    (M-step) Set
+
+$$
+\begin{aligned}
+\theta &:= \arg\max_{\theta} \sum_{i=1}^n \text{ELBO}(x^{(i)}; Q_i, \theta) \\
+&= \arg\max_{\theta} \sum_{i} \sum_{z^{(i)}} Q_i(z^{(i)}) \log \frac{p(x^{(i)}, z^{(i)}; \theta)}{Q_i(z^{(i)})}
+\end{aligned}
+$$
+
+}  
+If we start with $\theta_{(t)}$  
+
+$$
+\ell(\theta^{(t)}) = \sum_{i=1}^n \text{ELBO}(x^{(i)}; Q_i^{(t)}, \theta^{(t)})
+$$
+
+$$
+\begin{aligned}
+\ell(\theta^{(t+1)}) &\ge \sum_{i=1}^n \text{ELBO}(x^{(i)}; Q_i^{(t)}, \theta^{(t+1)}) \\
+&\ge \sum_{i=1}^n \text{ELBO}(x^{(i)}; Q_i^{(t)}, \theta^{(t)}) \\
+&= \ell(\theta^{(t)})
+\end{aligned}
+$$
+
+Hence,EM causes the likelihood to converge monotonically  
+There are several other forms of ELBO  
+
+$$
+\begin{aligned}
+\text{ELBO}(x; Q, \theta) &= \mathrm{E}_{z \sim Q}[\log p(x, z; \theta)] - \mathrm{E}_{z \sim Q}[\log Q(z)] \\
+&= \mathrm{E}_{z \sim Q}[\log p(x|z; \theta)] - D_{KL}(Q \| p_z)
+\end{aligned}
+$$
+
+$$
+D_{KL}(Q \| p_z) = \sum_{z} Q(z) \log \frac{Q(z)}{p(z)}
+$$
+
+Another form of ELBO(·) is
+
+$$
+\text{ELBO}(x; Q, \theta) = \log p(x) - D_{KL}(Q \| p_{z|x})
+$$
+
+### 11.4 Mixture of Gaussians revisited
+### 11.5 Variational inference and variational auto-encoder
+
+## Chapter 12 Principal components analysis
+PCA refers to **Principal Components Analysis**  
+Prior to running PCA per se, typically we first preprocess the data by normalizing each feature
+to have mean 0 and variance 1  
+
+$$
+x_j^{(i)} \leftarrow \frac{x_j^{(i)} - \mu_j}{\sigma_j}
+$$
+
+$$
+\begin{aligned}
+\frac{1}{n} \sum_{i=1}^n (x^{(i)T} u)^2 &= \frac{1}{n} \sum_{i=1}^n u^T x^{(i)} x^{(i)T} u \\
+&= u^T \left( \frac{1}{n} \sum_{i=1}^n x^{(i)} x^{(i)T} \right) u
+\end{aligned}
+$$
+
+As $|u| = 1$, the formula above gives the principal eigenvector of $\Sigma = \frac{1}{n} \sum_{i=1}^n x^{(i)} x^{(i)T}$, which is just the empirical covariance matrix of the data  
+We can represent $x_{(i)}$ as
+
+$$
+y^{(i)} = \begin{bmatrix} u_1^T x^{(i)} & u_2^T x^{(i)} & \cdots & u_k^T x^{(i)} \end{bmatrix}^T \in \mathbb{R}^k
+$$
+
+Thus, whereas $x_{(i)} \in \mathcal{R}_d$, the vector $y_{(i)}$ now gives a lower, $k$-dimensional, approximation for $x_{(i)}$. PCA is therefore also referred to as a **dimensionality reduction**  
+The vectors $u_1,...,u_k$ are called the first $k$ **principal components** of the data  
+## Chapter 13 Independent components analysis
