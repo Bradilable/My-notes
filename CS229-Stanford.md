@@ -1194,7 +1194,7 @@ $$
 \end{aligned}
 $$
 
-If we knew what the $z^{(i)}'s$ were  
+If we knew what the $z^{(i)}$'s were  
 
 $$
 \ell(\phi, \mu, \Sigma) = \sum_{i=1}^n \left[\log p(x^{(i)}\mid z^{(i)}; \mu, \Sigma) + \log p(z^{(i)}; \phi)\right]
@@ -1434,7 +1434,7 @@ $$
 $$
 
 which means $x \sim \mathcal{N}(0,AA^T)$
-In this circumstances, we can't tell if the source were mixed using $A$ or $AR$($R$is an arbitrary orthogonal matrix)
+In this circumstances, we can't tell if the source were mixed using $A$ or $AR$( $R$ is an arbitrary orthogonal matrix)
 ### 13.2 Densities and linear transformations
 if $s$ is a vector-valued distribution with density $p_s$, and
 $x = As$ for a square, invertible matrix $A$, then the density of $x$ is given by
