@@ -1398,7 +1398,7 @@ $$
 y^{(i)} = \begin{bmatrix} u_1^T x^{(i)} & u_2^T x^{(i)} & \cdots & u_k^T x^{(i)} \end{bmatrix}^T \in \mathbb{R}^k
 $$
 
-Thus, whereas $ x_{(i)} \in \mathcal{R}_d $, the vector $ y_{(i)} $ now gives a lower, $k$-dimensional, approximation for $x_{(i)}$. PCA is therefore also referred to as a **dimensionality reduction**  
+Thus, whereas $x_{(i)} \in \mathcal{R}_d$, the vector $y_{(i)}$ now gives a lower, $k$-dimensional, approximation for $x_{(i)}$. PCA is therefore also referred to as a **dimensionality reduction**  
 The vectors $u_1,...,u_k$ are called the first $k$ **principal components** of the data  
 ## Chapter 13 Independent components analysis
 **Independent Components Analysis(ICA)**, similar to PCA, find a new basis in which to represent our data  
@@ -1443,3 +1443,43 @@ p_x(x) = p_s(Wx) \cdot |W|
 $$
 
 ### 13.3 ICA algorithm
+We supposethat the distribution of each sources $s$ is given by a density $p_s$  
+
+$$
+p(s) = \prod_{j=1}^d p_s(s_j)
+$$
+
+$$
+p(x) = \prod_{j=1}^d p_s(w_j^T x) \cdot |W|
+$$
+
+We choose the sigmoid function as the cdf， so $p_s(s)=g^'(s)$  
+
+$$
+\ell(W) = \sum_{i=1}^n \left( \sum_{j=1}^d \log g'(w_j^T x^{(i)}) + \log |W| \right)
+$$
+
+Note that $\nabla_W |W| = |W|(W^{-1})^T$, the update rule is  
+
+```math
+W := W + \alpha \left(
+\begin{bmatrix}
+1 - 2g(w_1^T x^{(i)}) \\
+1 - 2g(w_2^T x^{(i)}) \\
+\vdots \\
+1 - 2g(w_d^T x^{(i)})
+\end{bmatrix}
+x^{(i)T} + (W^T)^{-1}
+\right)
+```
+
+## Chapter 14 Self-supervised learning and foundation models
+### 14.1 Pretraining and adaption
+The foundation models paradigm consists of two phases: pretraining and adaptation  
+**pretraining**  
+We pretrain the model with a pretraining loss, which is often an average of loss functions on all the examples: $L_{\text{pre}}(\theta) = \frac{1}{n} \sum_{i=1}^n \ell_{\text{pre}}(\theta, x^{(i)})$  
+**adaptation**
+if the downstream task doesn't have any labeled examples: zero-shot learning  
+relatively small examples: few-shot learning  
+
+Mathematically, the adapted model outputs $\omega^T \phi_{\hat \theta}(x)$
