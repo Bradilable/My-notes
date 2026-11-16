@@ -1398,6 +1398,48 @@ $$
 y^{(i)} = \begin{bmatrix} u_1^T x^{(i)} & u_2^T x^{(i)} & \cdots & u_k^T x^{(i)} \end{bmatrix}^T \in \mathbb{R}^k
 $$
 
-Thus, whereas $x_{(i)} \in \mathcal{R}_d$, the vector $y_{(i)}$ now gives a lower, $k$-dimensional, approximation for $x_{(i)}$. PCA is therefore also referred to as a **dimensionality reduction**  
+Thus, whereas $ x_{(i)} \in \mathcal{R}_d $, the vector $ y_{(i)} $ now gives a lower, $k$-dimensional, approximation for $x_{(i)}$. PCA is therefore also referred to as a **dimensionality reduction**  
 The vectors $u_1,...,u_k$ are called the first $k$ **principal components** of the data  
 ## Chapter 13 Independent components analysis
+**Independent Components Analysis(ICA)**, similar to PCA, find a new basis in which to represent our data  
+Assume we have some data $s \in \mathcal{R}_d$ that is generated via $d$ independent sources  
+
+$$
+x=As
+$$
+
+where $A$ is called the **mixing matrix**, $W=A_{-1}$ is called the unmixing matrix, we'll use $\omega^T_i$ to denote the $i$-th row of $W$, so that
+
+```math
+W =
+\begin{bmatrix}
+\text{—} & w_1^{T} & \text{—} \\
+         & \vdots  &         \\
+\text{—} & w_d^{T} & \text{—}
+\end{bmatrix}
+```
+
+so the $j$-th source can be recovered as $s_j^{(i)} = \omega_j^T x^{(i)}$  
+### 13.1 ICA ambiguities
+Let $P$ be any $d$-by-$d$ permutation matrix, there is no way to distinguish between $W$ and $PW$  
+We can't recover the corret scaling of the sources, either
+if $s \sim \mathcal{N}(0,I)$, we have
+
+$$
+\begin{aligned}
+\mathrm{E}_{s \sim \mathcal{N}(0, I)}[x] &= \mathrm{E}[As] = A\mathrm{E}[s] = 0 \\
+\mathrm{Cov}[x] &= \mathrm{E}_{s \sim \mathcal{N}(0, I)}[xx^T] = \mathrm{E}[Ass^T A^T] = A\mathrm{E}[ss^T]A^T = A \cdot \mathrm{Cov}[s] \cdot A^T = AA^T
+\end{aligned}
+$$
+
+which means $x \sim \mathcal{N}(0,AA^T)$
+In this circumstances, we can't tell if the source were mixed using $A$ or $AR$($R$is an arbitaray orthogonal matrix)
+### 13.2 Densities and linear transformations
+if $s$ is a vector-valued distribution with density $p_s$, and
+$x = As$ for a square, invertible matrix $A$, thenthedensityofx is given by
+
+$$
+p_x(x) = p_s(Wx) \cdot |W|
+$$
+
+### 13.3 ICA algorithm
