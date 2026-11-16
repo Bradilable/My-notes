@@ -55,15 +55,35 @@
   - [8.3 Sample complexity bounds](CS229-Stanford.md#83-sample-complexity-bounds)
 - [Chapter 9 Regularization and model selection](CS229-Stanford.md#chapter-9-regularization-and-model-selection)
   - [9.1 Regularization](CS229-Stanford.md#91-regularization)
+  - [9.2 Implicit regularization effect](CS229-Stanford.md#92-implicit-regularization-effect)
+  - [9.3 Model selection via cross validation](CS229-Stanford.md#93-model-selection-via-cross-validation)
+  - [9.4 Bayesian statistics and regularization](CS229-Stanford.md#94-bayesian-statistics-and-regularization)
+
+### [Part 4 Unsupervised learning](CS229-Stanford.md#part-4-unsupervised-learning)
+
+- [Chapter 10 Clustering and the k-means algorithm](CS229-Stanford.md#chapter-10-clustering-and-the-k-means-algorithm)
+- [Chapter 11 EM algorithms](CS229-Stanford.md#chapter-11-em-algorithms)
+  - [11.1 EM for mixture of Gaussians](CS229-Stanford.md#111-em-for-mixture-of-gaussians)
+  - [11.2 Jensen's inequality](CS229-Stanford.md#112-jensens-inequality)
+  - [11.3 General EM algorithms](CS229-Stanford.md#113-general-em-algorithms)
+  - [11.4 Mixture of Gaussians revisited](CS229-Stanford.md#114-mixture-of-gaussians-revisited)（待补充）
+  - [11.5 Variational inference and variational auto-encoder](CS229-Stanford.md#115-variational-inference-and-variational-auto-encoder)（待补充）
+- [Chapter 12 Principal components analysis](CS229-Stanford.md#chapter-12-principal-components-analysis)
+- [Chapter 13 Independent components analysis](CS229-Stanford.md#chapter-13-independent-components-analysis)
+  - [13.1 ICA ambiguities](CS229-Stanford.md#131-ica-ambiguities)
+  - [13.2 Densities and linear transformations](CS229-Stanford.md#132-densities-and-linear-transformations)
+  - [13.3 ICA algorithm](CS229-Stanford.md#133-ica-algorithm)
+- [Chapter 14 Self-supervised learning and foundation models](CS229-Stanford.md#chapter-14-self-supervised-learning-and-foundation-models)
+  - [14.1 Pretraining and adaptation](CS229-Stanford.md#141-pretraining-and-adaptation)
 
 ## 数学公式与符号约定
 
-行内公式使用 `$...$`，独立公式使用单独成行的 `$$`，多行推导在公式内使用 `aligned`。
+行内公式两侧各用一个美元符号，独立公式默认用单独成行的两个美元符号。多行推导可用 `aligned`，部分长公式保留 `math` 围栏以兼容 GitHub 渲染。
 
 | 符号 | 含义 |
 | --- | --- |
 | $h_\theta$ | 假设函数 |
-| $L$、 $log L$ | 似然、对数似然 |
+| $L$、$\ell = \log L$ | 似然、对数似然 |
 | $J$ | 代价函数；第 2.3 节为负对数似然 |
 | $\ell_{\mathrm{ce}}$ | 单样本交叉熵损失 |
 | $w^{(i)}$ | 局部加权回归的样本权重 |
