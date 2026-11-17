@@ -1,6 +1,6 @@
 # My-notes
 
-学习笔记仓库，目前包含 Stanford CS229 机器学习课程笔记。
+学习笔记仓库，目前包含 Stanford CS229 机器学习课程笔记和 MIT Flow matching and diffusion model 笔记。
 
 ## CS229 章节索引
 
@@ -75,6 +75,20 @@
   - [13.3 ICA algorithm](CS229-Stanford.md#133-ica-algorithm)
 - [Chapter 14 Self-supervised learning and foundation models](CS229-Stanford.md#chapter-14-self-supervised-learning-and-foundation-models)
   - [14.1 Pretraining and adaptation](CS229-Stanford.md#141-pretraining-and-adaptation)
+
+## Flow matching and diffusion model (MIT) 章节索引
+
+[打开完整笔记](Flow%20matching%20and%20diffusion%20model%28MIT%29.md)
+
+- [1 Introduction](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#1-introduction)
+- [2 Flow and Diffusion Models](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#2-flow-and-diffusion-models)
+  - [2.1 Flow Models](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#21-flow-models)
+  - [2.2 Diffusion Models](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#22-diffusion-models)
+- [3 Flow Matching](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#3-flow-matching)
+  - [3.1 Conditional and Marginal Probability Path](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#31-conditional-and-marginal-probability-path)
+  - [3.2 Conditional and Marginal Vector Fields](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#32-conditional-and-marginal-vector-fields)
+  - [3.3 Learning the Marginal Vector Field](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#33-learning-the-marginal-vector-field)
+- [4 Score Functions and Score Matching](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#4-score-functions-and-score-matching)
 
 ## 数学公式与符号约定
 
