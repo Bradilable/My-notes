@@ -55,7 +55,7 @@ $$
 
 We can now construct a generative model via an ODE by making the vector field a neural network vector field $u^{\theta}_t$  
 
-To inject some randomness, we simple make the initial condition $X_0$ random. Specifically, we choose an initial distribution$p_{inti}$. In most cases, we set $p_{inti} \sim \mathcal{N}(0,I_d)$ to be a simple
+To inject some randomness, we simple make the initial condition $X_0$ random. Specifically, we choose an initial distribution $p_{inti} $. In most cases, we set $p_{inti} \sim \mathcal{N}(0,I_d)$ to be a simple
 standard Gaussian.
 So a flow model will be  
 
@@ -166,4 +166,166 @@ $$
 p_0(\cdot | z) = p_{\text{init}}, \quad p_1(\cdot | z) = \delta_z \quad \text{for all } z \in \mathbb{R}^d
 $$
 
+In other words, a conditional probability path gradually converts the initial distribution $p_{inti}$ into a single data
+point  
 
+<img width="752" height="296" alt="image" src="https://github.com/user-attachments/assets/8913679d-bc09-42a1-9b1a-d4a94e527fc9" />
+
+Every conditional probability path $p_t(x|z)$ induces a **marginal probability path** $p_t(x)$  
+
+$$
+\begin{gathered}
+z \sim p_{\text{data}}, \quad x \sim p_t(\cdot | z) \quad \Rightarrow x \sim p_t \\
+p_t(x) = \int p_t(x|z)p_{\text{data}}(z)\mathrm{d}z
+\end{gathered}
+$$
+
+One particularly popular probability path is the **Gaussian probability path**  
+Let $\alpha_t$, $\beta_t$ be noise schedulers: two continuously differentiable, monotonic functions with $α0 = β1 = 0$ and $α1 = β0 = 1$  
+We then define the conditional probability path  
+
+$$
+p_t(\cdot|z) = \mathcal{N}(\alpha_t z, \beta_t^2 I_d)
+$$
+
+which fulfills  
+
+$$
+p_0(\cdot|z) = \mathcal{N}(\alpha_0 z, \beta_0^2 I_d) = \mathcal{N}(0, I_d), \quad \text{and} \quad p_1(\cdot|z) = \mathcal{N}(\alpha_1 z, \beta_1^2 I_d) = \delta_z
+$$
+
+We can express sampling from the marginal path $p_t$ as:  
+
+$$
+z \sim p_{\text{data}}, \epsilon \sim p_{\text{init}} = \mathcal{N}(0, I_d) \Rightarrow x = \alpha_t z + \beta_t \epsilon \sim p_t
+$$
+
+## 3.2 Conditional and Marginal Vector Fields  
+For every data point $z \in \mathcal{R}^d$, let $u^{target}_t(·|z)$ denote a conditional vector field  
+
+$$
+X_0 \sim p_{\text{init}}, \quad \frac{\mathrm{d}}{\mathrm{d}t} X_t = u_t^{\text{target}}(X_t|z) \quad \Rightarrow \quad X_t \sim p_t(\cdot|z) \quad (0 \le t \le 1)
+$$
+
+We define the **marginal vector field** $u_t^{\text{target}}(x)$ as:
+
+$$
+u_t^{\text{target}}(x) = \int u_t^{\text{target}}(x|z) \frac{p_t(x|z)p_{\text{data}}(z)}{p_t(x)} \mathrm{d}z
+$$
+
+$$
+X_0 \sim p_{\text{init}}, \quad \frac{\mathrm{d}}{\mathrm{d}t} X_t = u_t^{\text{target}}(X_t) \quad \Rightarrow \quad X_t \sim p_t \quad (0 \le t \le 1)
+$$
+
+This gives the flow  
+Back to the situation for Gaussian probability paths, let $\dot{\alpha}_t = \partial_t \alpha_t \text{ and } \dot{\beta}_t = \partial_t \beta_t$ denoterespective the time derivatives of $\alpha_t$ and $\beta_t$. We can prove that the **conditional Gaussian vector field** is given by
+
+$$
+u_t^{\text{target}}(x|z) = \left( \dot{\alpha}_t - \frac{\dot{\beta}_t}{\beta_t} \alpha_t \right) z + \frac{\dot{\beta}_t}{\beta_t} x
+$$
+
+$Proof.$  
+
+$$
+\psi_t^{\text{target}}(x|z) = \alpha_t z + \beta_t x
+$$
+
+$$
+X_t = \psi_t^{\text{target}}(X_0|z) = \alpha_t z + \beta_t X_0 \sim \mathcal{N}(\alpha_t z, \beta^2 I_d) = p_t(\cdot|z)
+$$
+
+$$
+\begin{aligned}
+& \qquad \frac{\mathrm{d}}{\mathrm{d}t} \psi_t^{\text{target}}(x|z) = u_t^{\text{target}}(\psi_t^{\text{target}}(x|z)|z) \quad \text{for all } x, z \in \mathbb{R}^d \\
+& \overset{(i)}{\Leftrightarrow} \quad \dot{\alpha}_t z + \dot{\beta}_t x = u_t^{\text{target}}(\alpha_t z + \beta_t x|z) \quad \text{for all } x, z \in \mathbb{R}^d \\
+& \overset{(ii)}{\Leftrightarrow} \quad \dot{\alpha}_t z + \dot{\beta}_t \left( \frac{x - \alpha_t z}{\beta_t} \right) = u_t^{\text{target}}(x|z) \quad \text{for all } x, z \in \mathbb{R}^d \\
+& \overset{(iii)}{\Leftrightarrow} \quad \left( \dot{\alpha}_t - \frac{\dot{\beta}_t}{\beta_t} \alpha_t \right) z + \frac{\dot{\beta}_t}{\beta_t} x = u_t^{\text{target}}(x|z) \quad \text{for all } x, z \in \mathbb{R}^d
+\end{aligned}
+$$
+
+<img width="746" height="468" alt="image" src="https://github.com/user-attachments/assets/3fba3c65-9656-4f49-89a4-943413cadc9b" />
+
+From Bayes's rule we have  
+
+$$
+\frac{p_t(x|z)p_{\text{data}}(z)}{p_t(x)} = \text{"posterior over data points } z \text{ given noisy data } x\text{"}
+$$
+
+Averaging over all data points, we obtain the marginal vector field  
+
+Define the **divergence operator** div as
+
+$$
+\mathrm{div}(v_t)(x) = \sum_{i=1}^d \frac{\partial}{\partial x_i} v_t^i(x)
+$$
+
+Let us consider an flow model with vector field $u_t^{\text{target}}$ with $X_0 \sim p_{init} = p_0$. Then  $X_t \sim p_t$ for all $0 ≤ t ≤ 1$ if and only if  
+
+$$
+\partial_t p_t(x) = -\mathrm{div}(p_t u_t^{\text{target}})(x) \quad \text{for all } x \in \mathbb{R}^d, 0 \le t \le 1
+$$
+
+This is known as the **continuity equation**  
+
+$$
+\begin{aligned}
+\partial_t p_t(x) &\overset{(i)}{=} \partial_t \int p_t(x|z)p_{\text{data}}(z)\mathrm{d}z = \int \partial_t p_t(x|z)p_{\text{data}}(z)\mathrm{d}z \\
+&\overset{(ii)}{=} \int -\mathrm{div}(p_t(\cdot|z)u_t^{\text{target}}(\cdot|z))(x)p_{\text{data}}(z)\mathrm{d}z \\
+&\overset{(iii)}{=} -\mathrm{div}\left(\int p_t(x|z)u_t^{\text{target}}(x|z)p_{\text{data}}(z)\mathrm{d}z\right) \\
+&\overset{(iv)}{=} -\mathrm{div}\left(p_t(x)\int u_t^{\text{target}}(x|z)\frac{p_t(x|z)p_{\text{data}}(z)}{p_t(x)}\mathrm{d}z\right)(x) \\
+&\overset{(v)}{=} -\mathrm{div}\left(p_t u_t^{\text{target}}\right)(x),
+\end{aligned}
+$$
+
+so we know that $u_t^{\text{target}}$ satisfies the continuity equation  
+## 3.3 Learning the Marginal Vector Field
+An intuitive way of obtaining $u^t_{\theta} \approx u_t^{\text{target}}$ is to use a mean-squared error, i.e. to use the **flow matching loss** defined as  
+
+$$
+\begin{aligned}
+\mathcal{L}_{\text{FM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, x \sim p_t}[\|u_t^\theta(x) - u_t^{\text{target}}(x)\|^2] \\
+&\overset{(i)}{=} \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot|z)}[\|u_t^\theta(x) - u_t^{\text{target}}(x)\|^2]
+\end{aligned}
+$$
+
+We also define the **conditional flow matching loss**  
+
+$$
+\mathcal{L}_{\text{CFM}}(\theta) = \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot|z)}[\|u_t^\theta(x) - u_t^{\text{target}}(x|z)\|^2]
+$$
+
+By explicitly regressing against the tractable, conditional vector field, we are implicitly regressing against the intractable, marginal vector field. The next result makes this intuition precise  
+The marginal flow matching loss equals the conditional flow matching loss up to a constant. That is,
+
+$$
+\mathcal{L}_{\text{FM}}(\theta) = \mathcal{L}_{\text{CFM}}(\theta) + C
+$$
+
+where $C$ is independent of $\theta$. Therefore, their gradients coincide:
+
+$$
+\nabla_\theta \mathcal{L}_{\text{FM}}(\theta) = \nabla_\theta \mathcal{L}_{\text{CFM}}(\theta)
+$$
+
+Therefore, flowmatching training consists of minimizing the conditional flowmatching loss
+
+<img width="701" height="316" alt="image" src="https://github.com/user-attachments/assets/5d38a935-9b75-4832-a4fe-4a6ac20202a7" />
+
+Specifically, for Gaussian conditional probability paths
+
+$$
+\begin{aligned}
+\mathcal{L}_{\text{CFM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim \mathcal{N}(\alpha_t z, \beta_t^2 I_d)} \left[ \left\| u_t^\theta(x) - \left( \dot{\alpha}_t - \frac{\dot{\beta}_t}{\beta_t} \alpha_t \right) z - \frac{\dot{\beta}_t}{\beta_t} x \right\|^2 \right] \\
+&\overset{(i)}{=} \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, \epsilon \sim \mathcal{N}(0, I_d)} \left[ \left\| u_t^\theta(\alpha_t z + \beta_t \epsilon) - (\dot{\alpha}_t z + \dot{\beta}_t \epsilon) \right\|^2 \right]
+\end{aligned}
+$$
+
+For the **CondOT probability path**, we have $\alpha_t=t$ and $\beta_t=1-t$  
+
+$$
+\mathcal{L}_{\text{cfm}}(\theta) = \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, \epsilon \sim \mathcal{N}(0, I_d)} \left[ \|u_t^\theta(tz + (1-t)\epsilon) - (z - \epsilon)\|^2 \right]
+$$
+
+<img width="749" height="301" alt="image" src="https://github.com/user-attachments/assets/2588a8a5-3a8b-4b29-a3f8-0535954d9937" />
+
+# 4 Score Functions and Score Matching
