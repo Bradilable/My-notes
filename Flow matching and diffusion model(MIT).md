@@ -630,3 +630,32 @@ $$
 <img width="614" height="263" alt="image" src="https://github.com/user-attachments/assets/2d42cace-ea41-4f6f-9365-023036ad5180" />
 
 # 6 Building Large-Scale Image or Video Generators
+## 6.1 Neural Network Architectures
+### 6.1.1 Enbedding th eConditioning Variables  
+
+**Embedding Time.** In practice, the scalar time is often embedded in a higher dimensional space using Fourier features, allowing the model to more faithfully capture high-frequency time dependence
+
+$$
+\text{TimeEmb}(t) = \sqrt{\frac{2}{d}} \left[ \cos(2\pi w_1 t) \quad \cdots \quad \cos(2\pi w_{d/2} t) \quad \sin(2\pi w_1 t) \quad \cdots \quad \sin(2\pi w_{d/2} t) \right]^T
+$$
+
+$$
+\text{TimeEmb}(t) = \sqrt{\frac{2}{d}} \left[ \cos(2\pi w_1 t) \quad \cdots \quad \cos(2\pi w_{d/2} t) \quad \sin(2\pi w_1 t) \quad \cdots \quad \sin(2\pi w_{d/2} t) \right]^T
+$$
+
+**Embedding Class Labels.** When $y_{\text{raw}} \in \mathcal{Y} \triangleq \{0, \dots, N\}$ is just a class label, then it is often easiest to simply learn a separate embedding vector for each of the $N+1$ possible values of $y_{raw}$, and set $y$ to this embedding vector  
+
+**Embedding Textual Input.** Models like **CLIP**(Contrastive Language-Image Pretraining) are used
+
+$$
+\text{PromptEmbed}(y_{\text{raw}}) \in \mathbb{R}^{S \times k}
+$$
+
+
+<img width="312" height="211" alt="image" src="https://github.com/user-attachments/assets/fcd44727-68ba-4ca9-952b-49696ca8252a" />
+
+### 6.1.2 Diffusion Transformers
+
+
+
+
