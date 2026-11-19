@@ -85,10 +85,20 @@
   - [2.1 Flow Models](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#21-flow-models)
   - [2.2 Diffusion Models](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#22-diffusion-models)
 - [3 Flow Matching](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#3-flow-matching)
-  - [3.1 Conditional and Marginal Probability Path](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#31-conditional-and-marginal-probability-path)
+  - [3.1 Conditional and Marginal Probability Paths](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#31-conditional-and-marginal-probability-paths)
   - [3.2 Conditional and Marginal Vector Fields](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#32-conditional-and-marginal-vector-fields)
   - [3.3 Learning the Marginal Vector Field](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#33-learning-the-marginal-vector-field)
 - [4 Score Functions and Score Matching](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#4-score-functions-and-score-matching)
+  - [4.1 Conditional and Marginal Score Functions](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#41-conditional-and-marginal-score-functions)
+  - [4.2 Sampling with SDEs](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#42-sampling-with-sdes)
+  - [4.3 Score Matching](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#43-score-matching)
+- [5 How to Condition on a Prompt](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#5-how-to-condition-on-a-prompt)
+  - [5.1 Vanilla Guidance](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#51-vanilla-guidance)
+  - [5.2 Classifier-Free Guidance](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#52-classifier-free-guidance)
+- [6 Building Large-Scale Image or Video Generators](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#6-building-large-scale-image-or-video-generators)
+  - [6.1 Neural Network Architectures](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#61-neural-network-architectures)
+    - [6.1.1 Embedding the Conditioning Variables](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#611-embedding-the-conditioning-variables)
+    - [6.1.2 Diffusion Transformers](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#612-diffusion-transformers)
 
 ## 数学公式与符号约定
 
