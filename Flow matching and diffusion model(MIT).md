@@ -104,14 +104,14 @@ $$
 $$
 
 Brownian motion is also called a **Wiener process**  
-We can easily simulate a Brownian motion approximately  
+We can sample Brownian motion exactly on a discrete time grid using independent Gaussian increments  
 
 $$
 W_{t+h} = W_t + \sqrt{h}\epsilon_t, \quad \epsilon_t \sim \mathcal{N}(0, I_d) \quad (t = 0, h, 2h, \dots, 1 - h)
 $$
 
 We need an equivalent formulation of ODEs that does not use derivatives so that we can use it on SDEs  
-Since we already know  
+For an ODE, the local increment satisfies  
 
 $$
 \begin{aligned}
@@ -121,15 +121,16 @@ $$
 \end{aligned}
 $$
 
+Here $R_t(h)\to 0$ as $h\to 0$. The corresponding Euler–Maruyama approximation for an SDE adds a Brownian increment.
+
 ```math
-X_{t+h} = X_t
-+ \underbrace{h u_t(X_t)}_{\text{deterministic}}
-+ \sigma_t \underbrace{(W_{t+h} - W_t)}_{\text{stochastic}}
-+ \underbrace{h R_t(h)}_{\text{error term}}
+X_{t+h} \approx X_t
++ \underbrace{h u_t(X_t)}_{\text{drift increment}}
++ \underbrace{\sigma_t (W_{t+h} - W_t)}_{\text{noise increment}}
 ```
 
 where $\sigma_t \ge 0$ describes the **diffusion coefficient**  
-The above describes a stochastic differential equation (SDE). It is common to denote it in the following symbolic notation:  
+The underlying stochastic differential equation (SDE) is written in differential notation as follows.  
 
 $$
 \begin{gathered}
@@ -138,7 +139,7 @@ X_0 = x_0
 \end{gathered}
 $$
 
-We use **Euler-Maruyama method** to simulate the SDE process  
+We use the **Euler–Maruyama method** to simulate the SDE, drawing a fresh independent increment at each step  
 
 $$
 X_{t+h} = X_t + h u_t(X_t) + \sqrt{h}\sigma_t \epsilon_t, \quad \epsilon_t \sim \mathcal{N}(0, I_d)
@@ -165,7 +166,7 @@ $$
 
 We use the end point $X_1$ as samples, our goal is to let the distribution of $X_1$ approximate $p_{\text{data}}$  
 
-## 3.1 Conditional and Marginal Probability Path
+## 3.1 Conditional and Marginal Probability Paths
 
 The first step of flow matching is to specify a probability path, which specifies a gradual interpolation between noise $p_{\text{init}}$ and data $p_{\text{data}}$  
 For a data point $z \in \mathbb{R}^d$, we denote with $\delta_z$ the **Dirac delta** “distribution”, sampling from $\delta_z$ always returns $z$.  A **conditional (interpolating) probability path** is a set of distributions $p_t(x \mid z)$ over $\mathbb{R}^d$ such that:  
@@ -189,7 +190,7 @@ p_t(x) = \int p_t(x \mid z)p_{\text{data}}(z)\mathrm{d}z
 $$
 
 One particularly popular probability path is the **Gaussian probability path**  
-Let $\alpha_t$, $\beta_t$ be noise schedulers: two continuously differentiable, monotonic functions with $\alpha_0 = \beta_1 = 0$ and $\alpha_1 = \beta_0 = 1$  
+Let $\alpha_t$, $\beta_t$ be noise schedulers: two continuously differentiable schedules with $\alpha_t$ increasing and $\beta_t$ decreasing, $\alpha_t,\beta_t>0$ for $0<t<1$, and $\alpha_0 = \beta_1 = 0$ and $\alpha_1 = \beta_0 = 1$  
 We then define the conditional probability path  
 
 $$
@@ -202,7 +203,7 @@ $$
 p_0(\cdot \mid z) = \mathcal{N}(\alpha_0 z, \beta_0^2 I_d) = \mathcal{N}(0, I_d), \quad \text{and} \quad p_1(\cdot \mid z) = \mathcal{N}(\alpha_1 z, \beta_1^2 I_d) = \delta_z
 $$
 
-We can express sampling from the marginal path $p_t$ as:  
+We can sample from the marginal path $p_t$ by drawing $z$ and $\epsilon$ independently  
 
 $$
 z \sim p_{\text{data}}, \epsilon \sim p_{\text{init}} = \mathcal{N}(0, I_d) \Rightarrow x = \alpha_t z + \beta_t \epsilon \sim p_t
@@ -226,8 +227,7 @@ $$
 X_0 \sim p_{\text{init}}, \quad \frac{\mathrm{d}}{\mathrm{d}t} X_t = u_t^{\text{target}}(X_t) \quad \Rightarrow \quad X_t \sim p_t \quad (0 \le t \le 1)
 $$
 
-This gives the flow  
-Back to the situation for Gaussian probability paths, let $\dot{\alpha}_t = \partial_t \alpha_t \text{ and } \dot{\beta}_t = \partial_t \beta_t$ denote, respectively, the time derivatives of $\alpha_t$ and $\beta_t$. We can prove that the **conditional Gaussian vector field** is given by
+For Gaussian probability paths, the conditional flow collapses to $z$ at $t=1$. Its vector field formula applies for $\beta_t>0$, with the endpoint distribution obtained by taking the limit. Let $\dot{\alpha}_t = \partial_t \alpha_t \text{ and } \dot{\beta}_t = \partial_t \beta_t$ denote, respectively, the time derivatives of $\alpha_t$ and $\beta_t$. We can prove that the **conditional Gaussian vector field** is given by
 
 $$
 u_t^{\text{target}}(x \mid z) = \left( \dot{\alpha}_t - \frac{\dot{\beta}_t}{\beta_t} \alpha_t \right) z + \frac{\dot{\beta}_t}{\beta_t} x
@@ -271,10 +271,10 @@ $$
 Let us consider a flow model with vector field $u_t^{\text{target}}$ with $X_0 \sim p_{\text{init}} = p_0$. Then $X_t \sim p_t$ for all $0 \le t \le 1$ if and only if  
 
 $$
-\partial_t p_t(x) = -\mathrm{div}(p_t u_t^{\text{target}})(x) \quad \text{for all } x \in \mathbb{R}^d, 0 \le t \le 1
+\partial_t p_t(x) = -\mathrm{div}(p_t u_t^{\text{target}})(x) \quad \text{for } x \in \mathbb{R}^d,\; 0<t<1
 $$
 
-This is known as the **continuity equation**  
+This is known as the **continuity equation**. The pointwise formula assumes sufficient smoothness, and the density evolution with its initial condition is understood in the weak sense when a distribution is singular.
 
 $$
 \begin{aligned}
@@ -309,10 +309,10 @@ By explicitly regressing against the tractable, conditional vector field, we are
 The marginal flow matching loss equals the conditional flow matching loss up to a constant. That is,
 
 $$
-\mathcal{L}_{\text{FM}}(\theta) = \mathcal{L}_{\text{CFM}}(\theta) + C
+\mathcal{L}_{\text{CFM}}(\theta) = \mathcal{L}_{\text{FM}}(\theta) + C
 $$
 
-where $C$ is independent of $\theta$. Therefore, their gradients coincide:
+where $C = \mathbb{E}\left[\|u_t^{\text{target}}(x\mid z)-u_t^{\text{target}}(x)\|^2\right]$ is independent of $\theta$. The residual has conditional mean zero given $(t,x)$, so the cross term vanishes. When the losses are finite and differentiable, their gradients coincide.
 
 $$
 \nabla_\theta \mathcal{L}_{\text{FM}}(\theta) = \nabla_\theta \mathcal{L}_{\text{CFM}}(\theta)
@@ -341,7 +341,7 @@ $$
 
 # 4 Score Functions and Score Matching
 ## 4.1 Conditional and Marginal Score Functions
-Let $q(x)$ be an arbitrary probability distribution, then the **score function** is defined as $\nabla \log q(x)$, which is the direction of steepest ascent with respect to log-likelihood  
+For a differentiable density $q$, the **score function** is $\nabla_x\log q(x)$ wherever $q(x)>0$. It points in the direction of steepest ascent of the log-density when the gradient is nonzero.  
 
 <img width="410" height="230" alt="image" src="https://github.com/user-attachments/assets/ac6e6fba-e751-43ff-82cb-c30d45fecfdc" />
 
@@ -357,7 +357,7 @@ $$
 \nabla \log p_t(x|z) = \nabla \log \mathcal{N}(x; \alpha_t z, \beta_t^2 I_d) = -\frac{x - \alpha_t z}{\beta_t^2}
 $$
 
-We also have the conversion formula for Gaussian probability paths  
+For Gaussian probability paths with $\alpha_t>0$ and $\beta_t>0$, the conversion formula is  
 
 $$
 \begin{aligned}
@@ -366,14 +366,14 @@ u_t^{\text{target}}(x) &= a_t \nabla \log p_t(x) + b_t x.
 \end{aligned}
 $$
 
-So that once we've learned $u_t^{\text{target}}$ we know the score function and vice versa  
+When $a_t\ne 0$, either the marginal vector field or the marginal score determines the other.  
 We define the **conditional and marginal denoiser** as
 
 $$
-D_t(x|z) = z, \quad D_t(x) = \int z \frac{p_t(x|z)p_{\text{data}}(z)}{p_t(x)} \mathrm{d}z \overset{(i)}{=} \frac{1}{\dot{\alpha}_t\beta_t - \alpha_t\dot{\beta}_t} (\beta_t u_t^{\text{target}}(x_t) - \dot{\beta}_t x_t)
+D_t(x|z) = z, \quad D_t(x) = \int z \frac{p_t(x|z)p_{\text{data}}(z)}{p_t(x)} \mathrm{d}z \overset{(i)}{=} \frac{1}{\dot{\alpha}_t\beta_t - \alpha_t\dot{\beta}_t} (\beta_t u_t^{\text{target}}(x) - \dot{\beta}_t x)
 $$
 
-People often call such models **denoising diffusion models**  
+The last equality applies to Gaussian paths when $\dot{\alpha}_t\beta_t-\alpha_t\dot{\beta}_t\ne 0$. People often call such models **denoising diffusion models**.  
 ## 4.2 Sampling with SDEs
 We may construct an SDE by adding stochastic dynamics to the dynamics of the original ODE as follows  
 
@@ -399,7 +399,7 @@ The stochastic dynamics are closely related to the **Langevin dynamics**
 
 <img width="675" height="436" alt="image" src="https://github.com/user-attachments/assets/be7c25e8-b88c-4947-b42e-d4b78f81a770" />
 
-As one can see, the trajectories are now zigzagged, illustrating the stochastic nature of the SDE’s evolution  
+The SDE and ODE share the same marginal distribution at each time. The Brownian term changes the distribution of whole trajectories.  
 For Gaussian probability path, the SDE extension trick would be  
 
 $$
@@ -422,10 +422,10 @@ $$
 X_0 \sim p_{\text{init}}, \quad \mathrm{d}X_t = u_t(X_t)\mathrm{d}t + \sigma_t \mathrm{d}W_t
 $$
 
-Then $X_t$ has distribution $p_t$ for all $0 \le t \le 1$ if and only if the **Fokker-Planck equation** holds:
+Assuming uniqueness for the initial-value problem and $p_0=p_{\text{init}}$, the marginal law of $X_t$ follows the **Fokker–Planck equation**
 
 $$
-\partial_t p_t(x) = -\mathrm{div}(p_t u_t)(x) + \frac{\sigma_t^2}{2} \Delta p_t(x) \quad \text{for all } x \in \mathbb{R}^d, 0 \le t \le 1
+\partial_t p_t(x) = -\mathrm{div}(p_t u_t)(x) + \frac{\sigma_t^2}{2} \Delta p_t(x) \quad \text{for } x \in \mathbb{R}^d,\; 0<t<1
 $$
 
 $$
@@ -464,16 +464,16 @@ We can design a **score matching loss** and a **denoising score matching loss**
 
 $$
 \begin{aligned}
-\mathcal{L}_{\text{SM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot|z)} \left[ \|s_t^\theta(x) - \nabla \log p_t(x)\|^2 \right] \\
-\mathcal{L}_{\text{CSM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot|z)} \left[ \|s_t^\theta(x) - \nabla \log p_t(x|z)\|^2 \right]
+\mathcal{L}_{\text{SM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot\mid z)} \left[ \|s_t^\theta(x) - \nabla \log p_t(x)\|^2 \right] \\
+\mathcal{L}_{\text{CSM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot\mid z)} \left[ \|s_t^\theta(x) - \nabla \log p_t(x|z)\|^2 \right]
 \end{aligned}
 $$
 
 $$
-\mathcal{L}_{\text{SM}}(\theta) = \mathcal{L}_{\text{CSM}}(\theta) + C
+\mathcal{L}_{\text{CSM}}(\theta) = \mathcal{L}_{\text{SM}}(\theta) + C
 $$
 
-Where $C$ is independent of parameters $$ \theta. Therefore, their gradients coincide
+Here $C=\mathbb{E}\left[\|\nabla_x\log p_t(x\mid z)-\nabla_x\log p_t(x)\|^2\right]$ is independent of $\theta$ when the losses are finite. Therefore, their gradients coincide where they exist. For Gaussian paths with $\beta_1=0$, training away from the singular endpoint or applying a suitable time weight can make these expectations finite.
 
 $$
 \nabla_\theta \mathcal{L}_{\text{SM}}(\theta) = \nabla_\theta \mathcal{L}_{\text{CSM}}(\theta)
@@ -509,6 +509,8 @@ s_t^\theta(\alpha_t z+\beta_t\epsilon)
 \end{aligned}
 $$
 
+Using the noise predictor $\epsilon_t^\theta(x)=-\beta_t s_t^\theta(x)$, the unweighted noise-prediction loss below corresponds to weighting the denoising score matching loss by $\beta_t^2$ at each time.
+
 ```math
 -\beta_t s_t^\theta(x)=\epsilon_t^\theta(x)
 \quad\Rightarrow\quad
@@ -530,7 +532,7 @@ We have our score matching algorithm as
 So far, the generative models we considered were unguided. However, in most cases, our goal is not to merely generate an arbitrary object, but to generate an object conditioned on some additional information  
 ## 5.1 Vanilla Guidance
 We think of a conditioning variable or prompt $y$ to live in a space $\mathcal{Y}$  
-We define a guided diffusion model to consist of a guided vector field $u_t^{\theta}(·|y)$  
+We define a guided diffusion model to consist of a guided vector field $u_t^{\theta}(\cdot\mid y)$  
 
 $$
 \begin{gathered}
@@ -592,7 +594,7 @@ $$
 \tilde{u}_t(x|y) = u_t^{\text{target}}(x) + w a_t \nabla \log p_t(y|x), \quad \text{(classifier guidance)}
 $$
 
-where $\omega$ is called the **guidance scale**, we can learn the log-likelihood via supervised learning  
+Here $w$ is the **guidance scale**. A classifier trained on noisy samples with labels can estimate $p_t(y\mid x)$, whose log-gradient is taken with respect to $x$.  
 
 **Classifier-Free Guidance.**  
 
@@ -609,7 +611,7 @@ $$
 \end{aligned}
 $$
 
-we may augment our label set with a new, additional $\emptyset$ label that denotes the absence of conditioning, since we'll train the two vector field in the one model  
+we may augment our label set with a new, additional $\emptyset$ label that denotes the absence of conditioning, so we can train both vector fields in one model  
 
 $$
 u_t^{\text{target}}(x) = u_t^{\text{target}}(x|\emptyset)
@@ -623,7 +625,7 @@ we will define some hyperparameter $\eta$ to be the probability that we discard 
 $$
 \begin{aligned}
 \mathcal{L}_{\text{CFM}}^{\text{CFG}}(\theta) &= \mathbb{E}_{\square} \| u_t^\theta(x|y) - u_t^{\text{target}}(x|z) \|^2 \\
-\square &= (z, y) \sim p_{\text{data}}(z, y), \ t \sim \text{Unif}[0, 1], \ x \sim p_t(\cdot|z), \text{ replace } y = \varnothing \text{ with prob. } \eta
+\square &= (z, y) \sim p_{\text{data}}(z, y), \ t \sim \text{Unif}[0, 1], \ x \sim p_t(\cdot\mid z), \text{ replace } y \text{ by } \emptyset \text{ with probability } \eta
 \end{aligned}
 $$
 
@@ -631,7 +633,7 @@ $$
 
 # 6 Building Large-Scale Image or Video Generators
 ## 6.1 Neural Network Architectures
-### 6.1.1 Enbedding th eConditioning Variables  
+### 6.1.1 Embedding the Conditioning Variables  
 
 **Embedding Time.** In practice, the scalar time is often embedded in a higher dimensional space using Fourier features, allowing the model to more faithfully capture high-frequency time dependence
 
@@ -639,13 +641,9 @@ $$
 \text{TimeEmb}(t) = \sqrt{\frac{2}{d}} \left[ \cos(2\pi w_1 t) \quad \cdots \quad \cos(2\pi w_{d/2} t) \quad \sin(2\pi w_1 t) \quad \cdots \quad \sin(2\pi w_{d/2} t) \right]^T
 $$
 
-$$
-\text{TimeEmb}(t) = \sqrt{\frac{2}{d}} \left[ \cos(2\pi w_1 t) \quad \cdots \quad \cos(2\pi w_{d/2} t) \quad \sin(2\pi w_1 t) \quad \cdots \quad \sin(2\pi w_{d/2} t) \right]^T
-$$
+**Embedding Class Labels.** When $y_{\text{raw}} \in \mathcal{Y} \triangleq \{0, \dots, N\}$ is just a class label, then it is often easiest to simply learn a separate embedding vector for each of the $N+1$ possible values of $y_{\text{raw}}$, and set $y$ to this embedding vector  
 
-**Embedding Class Labels.** When $y_{\text{raw}} \in \mathcal{Y} \triangleq \{0, \dots, N\}$ is just a class label, then it is often easiest to simply learn a separate embedding vector for each of the $N+1$ possible values of $y_{raw}$, and set $y$ to this embedding vector  
-
-**Embedding Textual Input.** Models like **CLIP**(Contrastive Language-Image Pretraining) are used
+**Embedding Textual Input.** Models like **CLIP** (Contrastive Language-Image Pretraining) are used
 
 $$
 \text{PromptEmbed}(y_{\text{raw}}) \in \mathbb{R}^{S \times k}
