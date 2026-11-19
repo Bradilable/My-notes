@@ -340,3 +340,190 @@ $$
 <img width="749" height="301" alt="image" src="https://github.com/user-attachments/assets/2588a8a5-3a8b-4b29-a3f8-0535954d9937" />
 
 # 4 Score Functions and Score Matching
+## 4.1 Conditional and Marginal Score Functions
+Let $q(x)$ be an arbitrary probability distribution, then the **score function** is defined as $\nabla \log q(x)$, which is the direction of steepest ascent with respect to log-likelihood  
+
+<img width="410" height="230" alt="image" src="https://github.com/user-attachments/assets/ac6e6fba-e751-43ff-82cb-c30d45fecfdc" />
+
+We can define the **conditional score function** as $\nabla \log p_t(x|z)$ and the **marginal score function** as $\nabla \log p_t(x)$
+
+$$
+\nabla \log p_t(x) = \int \nabla \log p_t(x|z) \frac{p_t(x|z)p_{\text{data}}(z)}{p_t(x)} \mathrm{d}z
+$$
+
+For Gaussian probability path, the score function would be  
+
+$$
+\nabla \log p_t(x|z) = \nabla \log \mathcal{N}(x; \alpha_t z, \beta_t^2 I_d) = -\frac{x - \alpha_t z}{\beta_t^2}
+$$
+
+We also have the conversion formula for Gaussian probability paths  
+
+$$
+\begin{aligned}
+u_t^{\text{target}}(x|z) &= a_t \nabla \log p_t(x|z) + b_t x, \quad a_t = \left( \beta_t^2 \frac{\dot{\alpha}_t}{\alpha_t} - \dot{\beta}_t \beta_t \right), \quad b_t = \frac{\dot{\alpha}_t}{\alpha_t} \\
+u_t^{\text{target}}(x) &= a_t \nabla \log p_t(x) + b_t x.
+\end{aligned}
+$$
+
+So that once we've learned $u_t^{\text{target}}$ we know the score function and vice versa  
+We define the **conditional and marginal denoiser** as
+
+$$
+D_t(x|z) = z, \quad D_t(x) = \int z \frac{p_t(x|z)p_{\text{data}}(z)}{p_t(x)} \mathrm{d}z \overset{(i)}{=} \frac{1}{\dot{\alpha}_t\beta_t - \alpha_t\dot{\beta}_t} (\beta_t u_t^{\text{target}}(x_t) - \dot{\beta}_t x_t)
+$$
+
+People often call such models **denoising diffusion models**  
+## 4.2 Sampling with SDEs
+We may construct an SDE by adding stochastic dynamics to the dynamics of the original ODE as follows  
+
+```math
+\begin{aligned}
+X_0 &\sim p_{\mathrm{init}}, \qquad
+\mathrm{d}X_t
+= u_t^{\mathrm{target}}(X_t)\mathrm{d}t
++ \frac{\sigma_t^2}{2}\nabla\log p_t(X_t)\mathrm{d}t
++ \sigma_t\mathrm{d}W_t \\
+&\qquad\qquad\quad
+= \left[
+u_t^{\mathrm{target}}(X_t)
++ \frac{\sigma_t^2}{2}\nabla\log p_t(X_t)
+\right]\mathrm{d}t
++ \sigma_t\mathrm{d}W_t \\[6pt]
+\Rightarrow\quad X_t &\sim p_t
+\qquad (0 \le t \le 1).
+\end{aligned}
+```
+
+The stochastic dynamics are closely related to the **Langevin dynamics**  
+
+<img width="675" height="436" alt="image" src="https://github.com/user-attachments/assets/be7c25e8-b88c-4947-b42e-d4b78f81a770" />
+
+As one can see, the trajectories are now zigzagged, illustrating the stochastic nature of the SDE’s evolution  
+For Gaussian probability path, the SDE extension trick would be  
+
+$$
+\begin{aligned}
+& X_0 \sim p_{\text{init}}, \quad \mathrm{d}X_t = \left[ \left( a_t + \frac{\sigma_t^2}{2} \right) \nabla \log p_t(X_t) + b_t X_t \right] \mathrm{d}t + \sigma_t \mathrm{d}W_t \\
+& \Rightarrow X_t \sim p_t \quad (0 \le t \le 1)
+\end{aligned}
+$$
+
+In the remainder of this section, we'll prove the **SDE extension trick** via the **Fokker-Planck equation**
+We first define the **Laplacian operator** $\Delta$ via  
+
+$$
+\Delta w_t(x) = \sum_{i=1}^d \frac{\partial^2}{\partial x_i^2} w_t(x) = \mathrm{div}(\nabla w_t)(x)
+$$
+
+Let $p_t$ be a probability path and let us consider the SDE:  
+
+$$
+X_0 \sim p_{\text{init}}, \quad \mathrm{d}X_t = u_t(X_t)\mathrm{d}t + \sigma_t \mathrm{d}W_t
+$$
+
+Then $X_t$ has distribution $p_t$ for all $0 \le t \le 1$ if and only if the **Fokker-Planck equation** holds:
+
+$$
+\partial_t p_t(x) = -\mathrm{div}(p_t u_t)(x) + \frac{\sigma_t^2}{2} \Delta p_t(x) \quad \text{for all } x \in \mathbb{R}^d, 0 \le t \le 1
+$$
+
+$$
+\begin{aligned}
+\partial_t p_t(x)
+&\overset{(i)}{=}
+-\mathrm{div}(p_t u_t^{\mathrm{target}})(x) \\
+&\overset{(ii)}{=}
+-\mathrm{div}(p_t u_t^{\mathrm{target}})(x)
+-\frac{\sigma_t^2}{2}\Delta p_t(x)
++\frac{\sigma_t^2}{2}\Delta p_t(x) \\
+&\overset{(iii)}{=}
+-\mathrm{div}(p_t u_t^{\mathrm{target}})(x)
+-\mathrm{div}\left(\frac{\sigma_t^2}{2}\nabla p_t\right)(x)
++\frac{\sigma_t^2}{2}\Delta p_t(x) \\
+&\overset{(iv)}{=}
+-\mathrm{div}(p_t u_t^{\mathrm{target}})(x)
+-\mathrm{div}\left(
+p_t\left[\frac{\sigma_t^2}{2}\nabla\log p_t\right]
+\right)(x)
++\frac{\sigma_t^2}{2}\Delta p_t(x) \\
+&\overset{(v)}{=}
+-\mathrm{div}\left(
+p_t\left[
+u_t^{\mathrm{target}}
++\frac{\sigma_t^2}{2}\nabla\log p_t
+\right]
+\right)(x)
++\frac{\sigma_t^2}{2}\Delta p_t(x)
+\end{aligned}
+$$
+
+## 4.3 Score Matching
+To approximate the marginal score $\nabla \log p_t$, we use a neural network that we call **score network** $s_t^\theta : \mathbb{R}^d \times [0, 1] \to \mathbb{R}^d$  
+We can design a **score matching loss** and a **denoising score matching loss**
+
+$$
+\begin{aligned}
+\mathcal{L}_{\text{SM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot|z)} \left[ \|s_t^\theta(x) - \nabla \log p_t(x)\|^2 \right] \\
+\mathcal{L}_{\text{CSM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot|z)} \left[ \|s_t^\theta(x) - \nabla \log p_t(x|z)\|^2 \right]
+\end{aligned}
+$$
+
+$$
+\mathcal{L}_{\text{SM}}(\theta) = \mathcal{L}_{\text{CSM}}(\theta) + C
+$$
+
+Where $C$ is independent of parameters $$ \theta. Therefore, their gradients coincide
+
+$$
+\nabla_\theta \mathcal{L}_{\text{SM}}(\theta) = \nabla_\theta \mathcal{L}_{\text{CSM}}(\theta)
+$$
+
+Score Matching for Gaussian Probability Paths:  
+
+$$
+\begin{aligned}
+\mathcal{L}_{\mathrm{CSM}}(\theta)
+&= \mathbb{E}_{t\sim\mathrm{Unif},\,z\sim p_{\mathrm{data}},\,x\sim p_t(\cdot\mid z)}
+\left[
+\left\|
+s_t^\theta(x)+\frac{x-\alpha_t z}{\beta_t^2}
+\right\|^2
+\right] \\
+&\overset{(i)}{=}
+\mathbb{E}_{t\sim\mathrm{Unif},\,z\sim p_{\mathrm{data}},\,\epsilon\sim\mathcal{N}(0,I_d)}
+\left[
+\left\|
+s_t^\theta(\alpha_t z+\beta_t\epsilon)
++\frac{\epsilon}{\beta_t}
+\right\|^2
+\right] \\
+&=
+\mathbb{E}_{t\sim\mathrm{Unif},\,z\sim p_{\mathrm{data}},\,\epsilon\sim\mathcal{N}(0,I_d)}
+\left[
+\frac{1}{\beta_t^2}
+\left\|
+\beta_t s_t^\theta(\alpha_t z+\beta_t\epsilon)+\epsilon
+\right\|^2
+\right]
+\end{aligned}
+$$
+
+```math
+-\beta_t s_t^\theta(x)=\epsilon_t^\theta(x)
+\quad\Rightarrow\quad
+\mathcal{L}_{\mathrm{DDPM}}(\theta)
+=
+\mathbb{E}_{t\sim\mathrm{Unif},\,z\sim p_{\mathrm{data}},\,\epsilon\sim\mathcal{N}(0,I_d)}
+\left[
+\left\|
+\epsilon_t^\theta(\alpha_t z+\beta_t\epsilon)-\epsilon
+\right\|^2
+\right]
+```
+
+We have our score matching algorithm as
+
+<img width="675" height="273" alt="image" src="https://github.com/user-attachments/assets/9a9bbb49-7625-43be-95f9-e092d61682cf" />
+
+# 5 How to Condition on a Prompt
