@@ -527,3 +527,106 @@ We have our score matching algorithm as
 <img width="675" height="273" alt="image" src="https://github.com/user-attachments/assets/9a9bbb49-7625-43be-95f9-e092d61682cf" />
 
 # 5 How to Condition on a Prompt
+So far, the generative models we considered were unguided. However, in most cases, our goal is not to merely generate an arbitrary object, but to generate an object conditioned on some additional information  
+## 5.1 Vanilla Guidance
+We think of a conditioning variable or prompt $y$ to live in a space $\mathcal{Y}$  
+We define a guided diffusion model to consist of a guided vector field $u_t^{\theta}(·|y)$  
+
+$$
+\begin{gathered}
+\textbf{Neural network: } u^\theta : \mathbb{R}^d \times \mathcal{Y} \times [0, 1] \to \mathbb{R}^d, \quad (x, y, t) \mapsto u_t^\theta(x|y) \\
+\textbf{Fixed: } \sigma_t : [0, 1] \to [0, \infty), \quad t \mapsto \sigma_t
+\end{gathered}
+$$
+
+$$
+\begin{aligned}
+& \textbf{Initialization:} \quad X_0 \sim p_{\text{init}} \\
+& \textbf{Simulation:} \quad \mathrm{d}X_t = u_t^\theta(X_t|y)\mathrm{d}t + \sigma_t \mathrm{d}W_t \\
+& \textbf{Goal:} \quad X_1 \sim p_{\text{data}}(\cdot|y)
+\end{aligned}
+$$
+
+When $\sigma_t = 0$, we say such a model is a **guided flow model**  
+
+$$
+\mathbb{E}_{z\sim p_{\mathrm{data}}(\cdot\mid y),\,x\sim p_t(\cdot\mid z)}
+\left\|
+u_t^\theta(x\mid y)-u_t^{\mathrm{target}}(x\mid z)
+\right\|^2
+$$
+
+We thus obtain a **guided conditional flow matching objective**
+
+```math
+\mathcal{L}_{\mathrm{CFM}}^{\mathrm{guided}}(\theta)
+=
+\mathbb{E}_{(z,y)\sim p_{\mathrm{data}}(z,y),\,t\sim\mathrm{Unif}[0,1],\,x\sim p_t(\cdot\mid z)}
+\left\|
+u_t^\theta(x\mid y)-u_t^{\mathrm{target}}(x\mid z)
+\right\|^2
+```
+
+## 5.2 Classifier-Free Guidance
+To truly generate samples that fit better to a prompt, we have to find a way to artificially reinforce the prompt variable $y$. The main technique for doing so is called **classifier-free guidance**  
+**Classifier Guidance.**  For simplicity, we will focus here on the case of Gaussian probability paths  
+
+$$
+u_t^{\text{target}}(x|y) = a_t \nabla \log p_t(x|y) + b_t x
+$$
+
+$$
+\begin{gathered}
+p_t(x|y) = \frac{p_t(x)p_t(y|x)}{p_t(y)} \\
+\nabla \log p_t(x|y) = \nabla \log \left( \frac{p_t(x)p_t(y|x)}{p_t(y)} \right) = \nabla \log p_t(x) + \nabla \log p_t(y|x)
+\end{gathered}
+$$
+
+$$
+u_t^{\text{target}}(x|y) = b_t x + a_t(\nabla \log p_t(x) + \nabla \log p_t(y|x)) = u_t^{\text{target}}(x) + a_t \nabla \log p_t(y|x)
+$$
+
+As people observed that their image $x$ did not fit their prompt $y$ well enough, it was a natural idea to scale up the contribution of the $\nabla \log p_t(y|x)$ term, yielding  
+
+$$
+\tilde{u}_t(x|y) = u_t^{\text{target}}(x) + w a_t \nabla \log p_t(y|x), \quad \text{(classifier guidance)}
+$$
+
+where $\omega$ is called the **guidance scale**, we can learn the log-likelihood via supervised learning  
+
+**Classifier-Free Guidance.**  
+
+$$
+\nabla \log p_t(x|y) = \nabla \log p_t(x) + \nabla \log p_t(y|x)
+$$
+
+$$
+\begin{aligned}
+\tilde{u}_t(x|y) &= u_t^{\text{target}}(x) + w a_t \nabla \log p_t(y|x) \\
+&= u_t^{\text{target}}(x) + w a_t (\nabla \log p_t(x|y) - \nabla \log p_t(x)) \\
+&= u_t^{\text{target}}(x) - (w b_t x + w a_t \nabla \log p_t(x)) + (w b_t x + w a_t \nabla \log p_t(x|y)) \\
+&= (1 - w)u_t^{\text{target}}(x) + w u_t^{\text{target}}(x|y).
+\end{aligned}
+$$
+
+we may augment our label set with a new, additional $\emptyset$ label that denotes the absence of conditioning, since we'll train the two vector field in the one model  
+
+$$
+u_t^{\text{target}}(x) = u_t^{\text{target}}(x|\emptyset)
+$$
+
+<img width="628" height="345" alt="image" src="https://github.com/user-attachments/assets/48be0b81-c2ed-4e66-a1ad-08ea09b90be4" />
+
+**Training and Classifier-Free Guidance.** 
+we will define some hyperparameter $\eta$ to be the probability that we discard the original label $y$, and replace it with $\emptyset$. We thus arrive at our **CFG conditional flow matching training objective**  
+
+$$
+\begin{aligned}
+\mathcal{L}_{\text{CFM}}^{\text{CFG}}(\theta) &= \mathbb{E}_{\square} \| u_t^\theta(x|y) - u_t^{\text{target}}(x|z) \|^2 \\
+\square &= (z, y) \sim p_{\text{data}}(z, y), \ t \sim \text{Unif}[0, 1], \ x \sim p_t(\cdot|z), \text{ replace } y = \varnothing \text{ with prob. } \eta
+\end{aligned}
+$$
+
+<img width="614" height="263" alt="image" src="https://github.com/user-attachments/assets/2d42cace-ea41-4f6f-9365-023036ad5180" />
+
+# 6 Building Large-Scale Image or Video Generators
