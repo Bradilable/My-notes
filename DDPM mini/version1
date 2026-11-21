@@ -1,0 +1,184 @@
+import math
+
+import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+torch.manual_seed(7)
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+rank = 8
+dim = rank * rank
+steps = 100
+noise_std = 0.15
+
+
+def design_matrix(coords):
+    """coords: [M, 2] -> A: [M, 64], with u(coords) = A @ w."""
+    modes = torch.arange(1, rank + 1, device=coords.device)
+    fx = torch.sin(math.pi * coords[:, 0:1] * modes)
+    gy = torch.sin(math.pi * coords[:, 1:2] * modes)
+
+    # Flatten f_i(x) g_j(y) in the same order as W.reshape(-1).
+    return (fx[:, :, None] * gy[:, None, :]).flatten(1)
+
+
+def sample_cores(n):
+    """Two structured families of Tucker cores."""
+    templates = torch.zeros(2, rank, rank, device=device)
+    templates[0, 0, 0] = 1.0
+    templates[0, 1, 2] = 0.8
+    templates[0, 3, 1] = -0.6
+    templates[1, 0, 1] = 1.0
+    templates[1, 2, 0] = -0.8
+    templates[1, 1, 3] = 0.6
+
+    family = torch.randint(2, (n,), device=device)
+    amplitude = 0.6 + 0.8 * torch.rand(n, 1, 1, device=device)
+    variation = 0.05 * torch.randn(n, rank, rank, device=device)
+    return (amplitude * templates[family] + variation).flatten(1)
+
+
+class Denoiser(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.time_embedding = nn.Embedding(steps, 32)
+        self.net = nn.Sequential(
+            nn.Linear(dim + 32, 128),
+            nn.SiLU(),
+            nn.Linear(128, 128),
+            nn.SiLU(),
+            nn.Linear(128, dim),
+        )
+
+    def forward(self, z, t):
+        return self.net(torch.cat([z, self.time_embedding(t)], dim=-1))
+
+
+# Train the diffusion prior in normalized coefficient space, z = (w - mean) / scale.
+w_train = sample_cores(4096)
+mean = w_train.mean(dim=0)
+scale = w_train.std().clamp_min(1e-6)
+z_train = (w_train - mean) / scale
+
+beta = torch.linspace(1e-4, 0.10, steps, device=device)
+alpha = 1 - beta
+alpha_bar = alpha.cumprod(dim=0)
+alpha_bar_prev = torch.cat([torch.ones(1, device=device), alpha_bar[:-1]])
+reverse_var = beta * (1 - alpha_bar_prev) / (1 - alpha_bar)
+
+model = Denoiser().to(device)
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
+
+for iteration in range(2500):
+    indices = torch.randint(len(z_train), (128,), device=device)
+    z0 = z_train[indices]
+    t = torch.randint(steps, (len(z0),), device=device)
+    eps = torch.randn_like(z0)
+    a = alpha_bar[t, None]
+    zt = a.sqrt() * z0 + (1 - a).sqrt() * eps
+
+    loss = F.mse_loss(model(zt, t), eps)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+    if (iteration + 1) % 500 == 0:
+        print(f"step {iteration + 1:4d} | noise MSE {loss.item():.4f}")
+
+
+@torch.no_grad()
+def reconstruct(A, obs, guidance):
+    """Return one reconstruction from the guided or unguided sampler."""
+    model.eval()
+    z = torch.randn(dim, device=device)
+
+    # obs = A @ (mean + scale * z0) + noise
+    A_latent = scale * A
+    obs_centered = obs - A @ mean
+    operator_norm_sq = torch.linalg.matrix_norm(A_latent, ord=2).square()
+    operator_norm_sq = operator_norm_sq.clamp_min(1e-8)
+
+    for i in reversed(range(steps)):
+        t = torch.tensor([i], device=device)
+        eps_hat = model(z[None, :], t)[0]
+        a = alpha_bar[i]
+        z0_hat = (z - (1 - a).sqrt() * eps_hat) / a.sqrt()
+
+        # Standard DDPM reverse mean.
+        z_next = (z - beta[i] / (1 - a).sqrt() * eps_hat) / alpha[i].sqrt()
+
+        # Approximate DPS gradient, omitting the denoiser Jacobian.
+        residual = A_latent @ z0_hat - obs_centered
+        grad = A_latent.T @ residual / a.sqrt()
+
+        # Heuristic step size. Weaken guidance early, when z0_hat is noisy.
+        z_next -= guidance * a * grad / operator_norm_sq
+
+        if i > 0:
+            z_next += reverse_var[i].sqrt() * torch.randn_like(z)
+        z = z_next
+
+    return mean + scale * z
+
+
+#固定 off-grid sensors, 共用 across validation 和 test fields.
+coords = torch.rand(16, 2, device=device)
+A = design_matrix(coords)
+axis = torch.linspace(0, 1, 32, device=device)
+xx, yy = torch.meshgrid(axis, axis, indexing="xy")
+grid = torch.stack([xx.flatten(), yy.flatten()], dim=1)
+A_grid = design_matrix(grid)
+
+# Tune the ridge penalty on independent validation fields, in field MSE.
+w_val = sample_cores(64)
+obs_val = w_val @ A.T
+obs_val += noise_std * torch.randn_like(obs_val)
+identity = torch.eye(dim, device=device)
+
+
+def ridge(y, penalty):
+    # Center the penalty at the training mean for a stronger baseline.
+    centered = y - mean @ A.T
+    weights = torch.linalg.solve(A.T @ A + penalty * identity, A.T)
+    return mean + centered @ weights.T
+
+
+penalty = min(
+    [0.01, 0.1, 1.0, 10.0, 100.0],
+    key=lambda p: ((ridge(obs_val, p) - w_val) @ A_grid.T).square().mean().item(),
+)
+
+w_true = sample_cores(1)[0]
+obs = A @ w_true + noise_std * torch.randn(len(coords), device=device)
+
+# Share the initial noise and reverse noise for this visual comparison.
+torch.manual_seed(123)
+w_prior = reconstruct(A, obs, guidance=0.0)
+torch.manual_seed(123)
+w_dps = reconstruct(A, obs, guidance=0.25)
+w_ridge = ridge(obs, penalty)
+
+truth = A_grid @ w_true
+vlim = truth.abs().max().item()
+fig, axes = plt.subplots(1, 4, figsize=(13, 3), constrained_layout=True)
+
+for ax, name, w in zip(
+    axes,
+    ["Ground truth", "Ridge", "DDPM prior", "DPS"],
+    [w_true, w_ridge, w_prior, w_dps],
+):
+    field = A_grid @ w
+    field_mse = F.mse_loss(field, truth).item()
+    sensor_mse = F.mse_loss(A @ w, obs).item()
+    ax.imshow(
+        field.reshape(32, 32).cpu(),
+        origin="lower", extent=(0, 1, 0, 1),
+        cmap="coolwarm", vmin=-vlim, vmax=vlim,
+    )
+    ax.scatter(*coords.cpu().T, s=7, c="black")
+    ax.set_title(f"{name}\nField MSE {field_mse:.3f}")
+    print(f"{name:12s} field MSE={field_mse:.4f}  sensor MSE={sensor_mse:.4f}")
+
+plt.show()
