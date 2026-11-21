@@ -47,7 +47,7 @@ $$
 X_{t+h} = X_t + h u_t(X_t) \quad (t = 0, h, 2h, 3h, \dots, 1 - h)
 $$
 
-where $h=n^{-1}$ is the stepsize  
+where $h=n^{-1}$ is the step size  
 We also have **Heun's method**  
 
 $$
@@ -190,7 +190,7 @@ p_t(x) = \int p_t(x \mid z)p_{\text{data}}(z)\mathrm{d}z
 $$
 
 One particularly popular probability path is the **Gaussian probability path**  
-Let $\alpha_t$, $\beta_t$ be noise schedulers: two continuously differentiable schedules with $\alpha_t$ increasing and $\beta_t$ decreasing, $\alpha_t,\beta_t>0$ for $0<t<1$, and $\alpha_0 = \beta_1 = 0$ and $\alpha_1 = \beta_0 = 1$  
+Let $\alpha_t$, $\beta_t$ be noise schedules: two continuously differentiable schedules with $\alpha_t$ increasing and $\beta_t$ decreasing, $\alpha_t,\beta_t>0$ for $0<t<1$, and $\alpha_0 = \beta_1 = 0$ and $\alpha_1 = \beta_0 = 1$  
 We then define the conditional probability path  
 
 $$
@@ -227,7 +227,7 @@ $$
 X_0 \sim p_{\text{init}}, \quad \frac{\mathrm{d}}{\mathrm{d}t} X_t = u_t^{\text{target}}(X_t) \quad \Rightarrow \quad X_t \sim p_t \quad (0 \le t \le 1)
 $$
 
-For Gaussian probability paths, the conditional flow collapses to $z$ at $t=1$. Its vector field formula applies for $\beta_t>0$, with the endpoint distribution obtained by taking the limit. Let $\dot{\alpha}_t = \partial_t \alpha_t \text{ and } \dot{\beta}_t = \partial_t \beta_t$ denote, respectively, the time derivatives of $\alpha_t$ and $\beta_t$. We can prove that the **conditional Gaussian vector field** is given by
+For Gaussian probability paths, the conditional flow collapses to $z$ at $t=1$. Its vector field formula applies for $\beta_t>0$, with the endpoint distribution obtained by taking the limit. Let $\dot{\alpha}_t = \partial_t \alpha_t$ and $\dot{\beta}_t = \partial_t \beta_t$ denote, respectively, the time derivatives of $\alpha_t$ and $\beta_t$. We can prove that the **conditional Gaussian vector field** is given by
 
 $$
 u_t^{\text{target}}(x \mid z) = \left( \dot{\alpha}_t - \frac{\dot{\beta}_t}{\beta_t} \alpha_t \right) z + \frac{\dot{\beta}_t}{\beta_t} x
@@ -280,7 +280,7 @@ $$
 \begin{aligned}
 \partial_t p_t(x) &\overset{(i)}{=} \partial_t \int p_t(x \mid z)p_{\text{data}}(z)\mathrm{d}z = \int \partial_t p_t(x \mid z)p_{\text{data}}(z)\mathrm{d}z \\
 &\overset{(ii)}{=} \int -\mathrm{div}(p_t(\cdot \mid z)u_t^{\text{target}}(\cdot \mid z))(x)p_{\text{data}}(z)\mathrm{d}z \\
-&\overset{(iii)}{=} -\mathrm{div}\left(\int p_t(x \mid z)u_t^{\text{target}}(x \mid z)p_{\text{data}}(z)\mathrm{d}z\right) \\
+&\overset{(iii)}{=} -\mathrm{div}\left(\int p_t(x \mid z)u_t^{\text{target}}(x \mid z)p_{\text{data}}(z)\mathrm{d}z\right)(x) \\
 &\overset{(iv)}{=} -\mathrm{div}\left(p_t(x)\int u_t^{\text{target}}(x \mid z)\frac{p_t(x \mid z)p_{\text{data}}(z)}{p_t(x)}\mathrm{d}z\right)(x) \\
 &\overset{(v)}{=} -\mathrm{div}\left(p_t u_t^{\text{target}}\right)(x),
 \end{aligned}
@@ -294,15 +294,15 @@ An intuitive way of obtaining $u_t^\theta \approx u_t^{\text{target}}$ is to use
 
 $$
 \begin{aligned}
-\mathcal{L}_{\text{FM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, x \sim p_t}[\|u_t^\theta(x) - u_t^{\text{target}}(x)\|^2] \\
-&\overset{(i)}{=} \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot \mid z)}[\|u_t^\theta(x) - u_t^{\text{target}}(x)\|^2]
+\mathcal{L}_{\text{FM}}(\theta) &= \mathbb{E}_{t \sim \mathrm{Unif}[0,1], x \sim p_t}[\|u_t^\theta(x) - u_t^{\text{target}}(x)\|^2] \\
+&\overset{(i)}{=} \mathbb{E}_{t \sim \mathrm{Unif}[0,1], z \sim p_{\text{data}}, x \sim p_t(\cdot \mid z)}[\|u_t^\theta(x) - u_t^{\text{target}}(x)\|^2]
 \end{aligned}
 $$
 
 We also define the **conditional flow matching loss**  
 
 $$
-\mathcal{L}_{\text{CFM}}(\theta) = \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot \mid z)}[\|u_t^\theta(x) - u_t^{\text{target}}(x \mid z)\|^2]
+\mathcal{L}_{\text{CFM}}(\theta) = \mathbb{E}_{t \sim \mathrm{Unif}[0,1], z \sim p_{\text{data}}, x \sim p_t(\cdot \mid z)}[\|u_t^\theta(x) - u_t^{\text{target}}(x \mid z)\|^2]
 $$
 
 By explicitly regressing against the tractable, conditional vector field, we are implicitly regressing against the intractable, marginal vector field. The next result makes this intuition precise  
@@ -326,15 +326,15 @@ Specifically, for Gaussian conditional probability paths
 
 $$
 \begin{aligned}
-\mathcal{L}_{\text{CFM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim \mathcal{N}(\alpha_t z, \beta_t^2 I_d)} \left[ \left\| u_t^\theta(x) - \left( \dot{\alpha}_t - \frac{\dot{\beta}_t}{\beta_t} \alpha_t \right) z - \frac{\dot{\beta}_t}{\beta_t} x \right\|^2 \right] \\
-&\overset{(i)}{=} \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, \epsilon \sim \mathcal{N}(0, I_d)} \left[ \left\| u_t^\theta(\alpha_t z + \beta_t \epsilon) - (\dot{\alpha}_t z + \dot{\beta}_t \epsilon) \right\|^2 \right]
+\mathcal{L}_{\text{CFM}}(\theta) &= \mathbb{E}_{t \sim \mathrm{Unif}[0,1], z \sim p_{\text{data}}, x \sim \mathcal{N}(\alpha_t z, \beta_t^2 I_d)} \left[ \left\| u_t^\theta(x) - \left( \dot{\alpha}_t - \frac{\dot{\beta}_t}{\beta_t} \alpha_t \right) z - \frac{\dot{\beta}_t}{\beta_t} x \right\|^2 \right] \\
+&\overset{(i)}{=} \mathbb{E}_{t \sim \mathrm{Unif}[0,1], z \sim p_{\text{data}}, \epsilon \sim \mathcal{N}(0, I_d)} \left[ \left\| u_t^\theta(\alpha_t z + \beta_t \epsilon) - (\dot{\alpha}_t z + \dot{\beta}_t \epsilon) \right\|^2 \right]
 \end{aligned}
 $$
 
 For the **CondOT probability path**, we have $\alpha_t=t$ and $\beta_t=1-t$  
 
 $$
-\mathcal{L}_{\text{CFM}}(\theta) = \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, \epsilon \sim \mathcal{N}(0, I_d)} \left[ \|u_t^\theta(tz + (1-t)\epsilon) - (z - \epsilon)\|^2 \right]
+\mathcal{L}_{\text{CFM}}(\theta) = \mathbb{E}_{t \sim \mathrm{Unif}[0,1], z \sim p_{\text{data}}, \epsilon \sim \mathcal{N}(0, I_d)} \left[ \|u_t^\theta(tz + (1-t)\epsilon) - (z - \epsilon)\|^2 \right]
 $$
 
 <img width="749" height="301" alt="image" src="https://github.com/user-attachments/assets/2588a8a5-3a8b-4b29-a3f8-0535954d9937" />
@@ -345,24 +345,24 @@ For a differentiable density $q$, the **score function** is $\nabla_x\log q(x)$ 
 
 <img width="410" height="230" alt="image" src="https://github.com/user-attachments/assets/ac6e6fba-e751-43ff-82cb-c30d45fecfdc" />
 
-We can define the **conditional score function** as $\nabla \log p_t(x|z)$ and the **marginal score function** as $\nabla \log p_t(x)$
+We can define the **conditional score function** as $\nabla_x \log p_t(x\mid z)$ and the **marginal score function** as $\nabla_x \log p_t(x)$
 
 $$
-\nabla \log p_t(x) = \int \nabla \log p_t(x|z) \frac{p_t(x|z)p_{\text{data}}(z)}{p_t(x)} \mathrm{d}z
+\nabla_x \log p_t(x) = \int \nabla_x \log p_t(x\mid z) \frac{p_t(x\mid z)p_{\text{data}}(z)}{p_t(x)} \mathrm{d}z
 $$
 
 For Gaussian probability path, the score function would be  
 
 $$
-\nabla \log p_t(x|z) = \nabla \log \mathcal{N}(x; \alpha_t z, \beta_t^2 I_d) = -\frac{x - \alpha_t z}{\beta_t^2}
+\nabla_x \log p_t(x\mid z) = \nabla_x \log \mathcal{N}(x; \alpha_t z, \beta_t^2 I_d) = -\frac{x - \alpha_t z}{\beta_t^2}
 $$
 
 For Gaussian probability paths with $\alpha_t>0$ and $\beta_t>0$, the conversion formula is  
 
 $$
 \begin{aligned}
-u_t^{\text{target}}(x|z) &= a_t \nabla \log p_t(x|z) + b_t x, \quad a_t = \left( \beta_t^2 \frac{\dot{\alpha}_t}{\alpha_t} - \dot{\beta}_t \beta_t \right), \quad b_t = \frac{\dot{\alpha}_t}{\alpha_t} \\
-u_t^{\text{target}}(x) &= a_t \nabla \log p_t(x) + b_t x.
+u_t^{\text{target}}(x\mid z) &= a_t \nabla_x \log p_t(x\mid z) + b_t x, \quad a_t = \left( \beta_t^2 \frac{\dot{\alpha}_t}{\alpha_t} - \dot{\beta}_t \beta_t \right), \quad b_t = \frac{\dot{\alpha}_t}{\alpha_t} \\
+u_t^{\text{target}}(x) &= a_t \nabla_x \log p_t(x) + b_t x.
 \end{aligned}
 $$
 
@@ -370,7 +370,7 @@ When $a_t\ne 0$, either the marginal vector field or the marginal score determin
 We define the **conditional and marginal denoiser** as
 
 $$
-D_t(x|z) = z, \quad D_t(x) = \int z \frac{p_t(x|z)p_{\text{data}}(z)}{p_t(x)} \mathrm{d}z \overset{(i)}{=} \frac{1}{\dot{\alpha}_t\beta_t - \alpha_t\dot{\beta}_t} (\beta_t u_t^{\text{target}}(x) - \dot{\beta}_t x)
+D_t(x\mid z) = z, \quad D_t(x) = \int z \frac{p_t(x\mid z)p_{\text{data}}(z)}{p_t(x)} \mathrm{d}z \overset{(i)}{=} \frac{1}{\dot{\alpha}_t\beta_t - \alpha_t\dot{\beta}_t} (\beta_t u_t^{\text{target}}(x) - \dot{\beta}_t x)
 $$
 
 The last equality applies to Gaussian paths when $\dot{\alpha}_t\beta_t-\alpha_t\dot{\beta}_t\ne 0$. People often call such models **denoising diffusion models**.  
@@ -382,12 +382,12 @@ We may construct an SDE by adding stochastic dynamics to the dynamics of the ori
 X_0 &\sim p_{\mathrm{init}}, \qquad
 \mathrm{d}X_t
 = u_t^{\mathrm{target}}(X_t)\mathrm{d}t
-+ \frac{\sigma_t^2}{2}\nabla\log p_t(X_t)\mathrm{d}t
++ \frac{\sigma_t^2}{2}\nabla_x\log p_t(X_t)\mathrm{d}t
 + \sigma_t\mathrm{d}W_t \\
 &\qquad\qquad\quad
 = \left[
 u_t^{\mathrm{target}}(X_t)
-+ \frac{\sigma_t^2}{2}\nabla\log p_t(X_t)
++ \frac{\sigma_t^2}{2}\nabla_x\log p_t(X_t)
 \right]\mathrm{d}t
 + \sigma_t\mathrm{d}W_t \\[6pt]
 \Rightarrow\quad X_t &\sim p_t
@@ -404,7 +404,7 @@ For Gaussian probability path, the SDE extension trick would be
 
 $$
 \begin{aligned}
-& X_0 \sim p_{\text{init}}, \quad \mathrm{d}X_t = \left[ \left( a_t + \frac{\sigma_t^2}{2} \right) \nabla \log p_t(X_t) + b_t X_t \right] \mathrm{d}t + \sigma_t \mathrm{d}W_t \\
+& X_0 \sim p_{\text{init}}, \quad \mathrm{d}X_t = \left[ \left( a_t + \frac{\sigma_t^2}{2} \right) \nabla_x \log p_t(X_t) + b_t X_t \right] \mathrm{d}t + \sigma_t \mathrm{d}W_t \\
 & \Rightarrow X_t \sim p_t \quad (0 \le t \le 1)
 \end{aligned}
 $$
@@ -413,7 +413,7 @@ In the remainder of this section, we'll prove the **SDE extension trick** via th
 We first define the **Laplacian operator** $\Delta$ via  
 
 $$
-\Delta w_t(x) = \sum_{i=1}^d \frac{\partial^2}{\partial x_i^2} w_t(x) = \mathrm{div}(\nabla w_t)(x)
+\Delta w_t(x) = \sum_{i=1}^d \frac{\partial^2}{\partial x_i^2} w_t(x) = \mathrm{div}(\nabla_x w_t)(x)
 $$
 
 Let $p_t$ be a probability path and let us consider the SDE:  
@@ -428,7 +428,7 @@ $$
 \partial_t p_t(x) = -\mathrm{div}(p_t u_t)(x) + \frac{\sigma_t^2}{2} \Delta p_t(x) \quad \text{for } x \in \mathbb{R}^d,\; 0<t<1
 $$
 
-$$
+```math
 \begin{aligned}
 \partial_t p_t(x)
 &\overset{(i)}{=}
@@ -439,33 +439,33 @@ $$
 +\frac{\sigma_t^2}{2}\Delta p_t(x) \\
 &\overset{(iii)}{=}
 -\mathrm{div}(p_t u_t^{\mathrm{target}})(x)
--\mathrm{div}\left(\frac{\sigma_t^2}{2}\nabla p_t\right)(x)
+-\mathrm{div}\left(\frac{\sigma_t^2}{2}\nabla_x p_t\right)(x)
 +\frac{\sigma_t^2}{2}\Delta p_t(x) \\
 &\overset{(iv)}{=}
 -\mathrm{div}(p_t u_t^{\mathrm{target}})(x)
 -\mathrm{div}\left(
-p_t\left[\frac{\sigma_t^2}{2}\nabla\log p_t\right]
+p_t\left[\frac{\sigma_t^2}{2}\nabla_x\log p_t\right]
 \right)(x)
 +\frac{\sigma_t^2}{2}\Delta p_t(x) \\
 &\overset{(v)}{=}
 -\mathrm{div}\left(
 p_t\left[
 u_t^{\mathrm{target}}
-+\frac{\sigma_t^2}{2}\nabla\log p_t
++\frac{\sigma_t^2}{2}\nabla_x\log p_t
 \right]
 \right)(x)
 +\frac{\sigma_t^2}{2}\Delta p_t(x)
 \end{aligned}
-$$
+```
 
 ## 4.3 Score Matching
-To approximate the marginal score $\nabla \log p_t$, we use a neural network that we call **score network** $s_t^\theta : \mathbb{R}^d \times [0, 1] \to \mathbb{R}^d$  
+To approximate the marginal score $\nabla_x \log p_t$, we use a neural network that we call **score network** $s^\theta : \mathbb{R}^d \times [0, 1] \to \mathbb{R}^d$, with $s^\theta(x,t)=s_t^\theta(x)$  
 We can design a **score matching loss** and a **denoising score matching loss**
 
 $$
 \begin{aligned}
-\mathcal{L}_{\text{SM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot\mid z)} \left[ \|s_t^\theta(x) - \nabla \log p_t(x)\|^2 \right] \\
-\mathcal{L}_{\text{CSM}}(\theta) &= \mathbb{E}_{t \sim \text{Unif}, z \sim p_{\text{data}}, x \sim p_t(\cdot\mid z)} \left[ \|s_t^\theta(x) - \nabla \log p_t(x|z)\|^2 \right]
+\mathcal{L}_{\text{SM}}(\theta) &= \mathbb{E}_{t \sim \mathrm{Unif}[0,1], z \sim p_{\text{data}}, x \sim p_t(\cdot\mid z)} \left[ \|s_t^\theta(x) - \nabla_x \log p_t(x)\|^2 \right] \\
+\mathcal{L}_{\text{CSM}}(\theta) &= \mathbb{E}_{t \sim \mathrm{Unif}[0,1], z \sim p_{\text{data}}, x \sim p_t(\cdot\mid z)} \left[ \|s_t^\theta(x) - \nabla_x \log p_t(x\mid z)\|^2 \right]
 \end{aligned}
 $$
 
@@ -481,17 +481,17 @@ $$
 
 Score Matching for Gaussian Probability Paths:  
 
-$$
+```math
 \begin{aligned}
 \mathcal{L}_{\mathrm{CSM}}(\theta)
-&= \mathbb{E}_{t\sim\mathrm{Unif},\,z\sim p_{\mathrm{data}},\,x\sim p_t(\cdot\mid z)}
+&= \mathbb{E}_{t\sim\mathrm{Unif}[0,1],\,z\sim p_{\mathrm{data}},\,x\sim p_t(\cdot\mid z)}
 \left[
 \left\|
 s_t^\theta(x)+\frac{x-\alpha_t z}{\beta_t^2}
 \right\|^2
 \right] \\
 &\overset{(i)}{=}
-\mathbb{E}_{t\sim\mathrm{Unif},\,z\sim p_{\mathrm{data}},\,\epsilon\sim\mathcal{N}(0,I_d)}
+\mathbb{E}_{t\sim\mathrm{Unif}[0,1],\,z\sim p_{\mathrm{data}},\,\epsilon\sim\mathcal{N}(0,I_d)}
 \left[
 \left\|
 s_t^\theta(\alpha_t z+\beta_t\epsilon)
@@ -499,7 +499,7 @@ s_t^\theta(\alpha_t z+\beta_t\epsilon)
 \right\|^2
 \right] \\
 &=
-\mathbb{E}_{t\sim\mathrm{Unif},\,z\sim p_{\mathrm{data}},\,\epsilon\sim\mathcal{N}(0,I_d)}
+\mathbb{E}_{t\sim\mathrm{Unif}[0,1],\,z\sim p_{\mathrm{data}},\,\epsilon\sim\mathcal{N}(0,I_d)}
 \left[
 \frac{1}{\beta_t^2}
 \left\|
@@ -507,7 +507,7 @@ s_t^\theta(\alpha_t z+\beta_t\epsilon)
 \right\|^2
 \right]
 \end{aligned}
-$$
+```
 
 Using the noise predictor $\epsilon_t^\theta(x)=-\beta_t s_t^\theta(x)$, the unweighted noise-prediction loss below corresponds to weighting the denoising score matching loss by $\beta_t^2$ at each time.
 
@@ -516,7 +516,7 @@ Using the noise predictor $\epsilon_t^\theta(x)=-\beta_t s_t^\theta(x)$, the unw
 \quad\Rightarrow\quad
 \mathcal{L}_{\mathrm{DDPM}}(\theta)
 =
-\mathbb{E}_{t\sim\mathrm{Unif},\,z\sim p_{\mathrm{data}},\,\epsilon\sim\mathcal{N}(0,I_d)}
+\mathbb{E}_{t\sim\mathrm{Unif}[0,1],\,z\sim p_{\mathrm{data}},\,\epsilon\sim\mathcal{N}(0,I_d)}
 \left[
 \left\|
 \epsilon_t^\theta(\alpha_t z+\beta_t\epsilon)-\epsilon
@@ -536,16 +536,16 @@ We define a guided diffusion model to consist of a guided vector field $u_t^{\th
 
 $$
 \begin{gathered}
-\textbf{Neural network: } u^\theta : \mathbb{R}^d \times \mathcal{Y} \times [0, 1] \to \mathbb{R}^d, \quad (x, y, t) \mapsto u_t^\theta(x|y) \\
-\textbf{Fixed: } \sigma_t : [0, 1] \to [0, \infty), \quad t \mapsto \sigma_t
+\textbf{Neural network: } u^\theta : \mathbb{R}^d \times \mathcal{Y} \times [0, 1] \to \mathbb{R}^d, \quad (x, y, t) \mapsto u_t^\theta(x\mid y) \\
+\textbf{Fixed: } \sigma : [0, 1] \to [0, \infty), \quad t \mapsto \sigma_t
 \end{gathered}
 $$
 
 $$
 \begin{aligned}
 & \textbf{Initialization:} \quad X_0 \sim p_{\text{init}} \\
-& \textbf{Simulation:} \quad \mathrm{d}X_t = u_t^\theta(X_t|y)\mathrm{d}t + \sigma_t \mathrm{d}W_t \\
-& \textbf{Goal:} \quad X_1 \sim p_{\text{data}}(\cdot|y)
+& \textbf{Simulation:} \quad \mathrm{d}X_t = u_t^\theta(X_t\mid y)\mathrm{d}t + \sigma_t \mathrm{d}W_t \\
+& \textbf{Goal:} \quad X_1 \sim p_{\text{data}}(\cdot\mid y)
 \end{aligned}
 $$
 
@@ -563,7 +563,7 @@ We thus obtain a **guided conditional flow matching objective**
 ```math
 \mathcal{L}_{\mathrm{CFM}}^{\mathrm{guided}}(\theta)
 =
-\mathbb{E}_{(z,y)\sim p_{\mathrm{data}}(z,y),\,t\sim\mathrm{Unif}[0,1],\,x\sim p_t(\cdot\mid z)}
+\mathbb{E}_{(z,y)\sim p_{\mathrm{data}},\,t\sim\mathrm{Unif}[0,1],\,x\sim p_t(\cdot\mid z)}
 \left\|
 u_t^\theta(x\mid y)-u_t^{\mathrm{target}}(x\mid z)
 \right\|^2
@@ -574,24 +574,24 @@ To truly generate samples that fit better to a prompt, we have to find a way to 
 **Classifier Guidance.**  For simplicity, we will focus here on the case of Gaussian probability paths  
 
 $$
-u_t^{\text{target}}(x|y) = a_t \nabla \log p_t(x|y) + b_t x
+u_t^{\text{target}}(x\mid y) = a_t \nabla_x \log p_t(x\mid y) + b_t x
 $$
 
 $$
 \begin{gathered}
-p_t(x|y) = \frac{p_t(x)p_t(y|x)}{p_t(y)} \\
-\nabla \log p_t(x|y) = \nabla \log \left( \frac{p_t(x)p_t(y|x)}{p_t(y)} \right) = \nabla \log p_t(x) + \nabla \log p_t(y|x)
+p_t(x\mid y) = \frac{p_t(x)p_t(y\mid x)}{p_t(y)} \\
+\nabla_x \log p_t(x\mid y) = \nabla_x \log \left( \frac{p_t(x)p_t(y\mid x)}{p_t(y)} \right) = \nabla_x \log p_t(x) + \nabla_x \log p_t(y\mid x)
 \end{gathered}
 $$
 
 $$
-u_t^{\text{target}}(x|y) = b_t x + a_t(\nabla \log p_t(x) + \nabla \log p_t(y|x)) = u_t^{\text{target}}(x) + a_t \nabla \log p_t(y|x)
+u_t^{\text{target}}(x\mid y) = b_t x + a_t(\nabla_x \log p_t(x) + \nabla_x \log p_t(y\mid x)) = u_t^{\text{target}}(x) + a_t \nabla_x \log p_t(y\mid x)
 $$
 
-As people observed that their image $x$ did not fit their prompt $y$ well enough, it was a natural idea to scale up the contribution of the $\nabla \log p_t(y|x)$ term, yielding  
+As people observed that their image $x$ did not fit their prompt $y$ well enough, it was a natural idea to scale up the contribution of the $\nabla_x \log p_t(y\mid x)$ term, yielding  
 
 $$
-\tilde{u}_t(x|y) = u_t^{\text{target}}(x) + w a_t \nabla \log p_t(y|x), \quad \text{(classifier guidance)}
+\tilde{u}_t(x\mid y) = u_t^{\text{target}}(x) + w a_t \nabla_x \log p_t(y\mid x), \quad \text{(classifier guidance)}
 $$
 
 Here $w$ is the **guidance scale**. A classifier trained on noisy samples with labels can estimate $p_t(y\mid x)$, whose log-gradient is taken with respect to $x$.  
@@ -599,35 +599,43 @@ Here $w$ is the **guidance scale**. A classifier trained on noisy samples with l
 **Classifier-Free Guidance.**  
 
 $$
-\nabla \log p_t(x|y) = \nabla \log p_t(x) + \nabla \log p_t(y|x)
+\nabla_x \log p_t(x\mid y) = \nabla_x \log p_t(x) + \nabla_x \log p_t(y\mid x)
 $$
 
 $$
 \begin{aligned}
-\tilde{u}_t(x|y) &= u_t^{\text{target}}(x) + w a_t \nabla \log p_t(y|x) \\
-&= u_t^{\text{target}}(x) + w a_t (\nabla \log p_t(x|y) - \nabla \log p_t(x)) \\
-&= u_t^{\text{target}}(x) - (w b_t x + w a_t \nabla \log p_t(x)) + (w b_t x + w a_t \nabla \log p_t(x|y)) \\
-&= (1 - w)u_t^{\text{target}}(x) + w u_t^{\text{target}}(x|y).
+\tilde{u}_t(x\mid y) &= u_t^{\text{target}}(x) + w a_t \nabla_x \log p_t(y\mid x) \\
+&= u_t^{\text{target}}(x) + w a_t (\nabla_x \log p_t(x\mid y) - \nabla_x \log p_t(x)) \\
+&= u_t^{\text{target}}(x) - (w b_t x + w a_t \nabla_x \log p_t(x)) + (w b_t x + w a_t \nabla_x \log p_t(x\mid y)) \\
+&= (1 - w)u_t^{\text{target}}(x) + w u_t^{\text{target}}(x\mid y).
 \end{aligned}
 $$
 
 we may augment our label set with a new, additional $\emptyset$ label that denotes the absence of conditioning, so we can train both vector fields in one model  
 
 $$
-u_t^{\text{target}}(x) = u_t^{\text{target}}(x|\emptyset)
+u_t^{\text{target}}(x) = u_t^{\text{target}}(x\mid \emptyset)
 $$
 
 <img width="628" height="345" alt="image" src="https://github.com/user-attachments/assets/48be0b81-c2ed-4e66-a1ad-08ea09b90be4" />
 
 **Training and Classifier-Free Guidance.** 
-we will define some hyperparameter $\eta$ to be the probability that we discard the original label $y$, and replace it with $\emptyset$. We thus arrive at our **CFG conditional flow matching training objective**  
+Let $\eta$ be the probability of replacing the original label $y$ with $\emptyset$. Write $\tilde y$ for the resulting label. We thus arrive at our **CFG conditional flow matching training objective**  
 
-$$
+```math
 \begin{aligned}
-\mathcal{L}_{\text{CFM}}^{\text{CFG}}(\theta) &= \mathbb{E}_{\square} \| u_t^\theta(x|y) - u_t^{\text{target}}(x|z) \|^2 \\
-\square &= (z, y) \sim p_{\text{data}}(z, y), \ t \sim \text{Unif}[0, 1], \ x \sim p_t(\cdot\mid z), \text{ replace } y \text{ by } \emptyset \text{ with probability } \eta
+\mathcal{L}_{\text{CFM}}^{\text{CFG}}(\theta)
+&= \mathbb{E}_{(z,y)\sim p_{\text{data}},\,t\sim\mathrm{Unif}[0,1],\,x\sim p_t(\cdot\mid z),\,m\sim\mathrm{Bernoulli}(\eta)}
+\left[\left\|u_t^\theta(x\mid\tilde y)-u_t^{\text{target}}(x\mid z)\right\|^2\right], \\
+\tilde y &=
+\begin{cases}
+\emptyset & m=1,\\
+y & m=0.
+\end{cases}
 \end{aligned}
-$$
+```
+
+The dropout draw $m$ is independent of $(z,y,t,x)$.
 
 <img width="614" height="263" alt="image" src="https://github.com/user-attachments/assets/2d42cace-ea41-4f6f-9365-023036ad5180" />
 
