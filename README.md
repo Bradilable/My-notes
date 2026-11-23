@@ -1,6 +1,6 @@
 # My-notes
 
-学习笔记仓库，目前包含 Stanford CS229 机器学习课程笔记和 MIT Flow matching and diffusion model 笔记。
+学习笔记仓库，目前包含 Stanford CS229 机器学习课程笔记、MIT Flow matching and diffusion model 笔记和 Tensor Decomposition and Applications 笔记。
 
 ## CS229 章节索引
 
@@ -99,6 +99,30 @@
   - [6.1 Neural Network Architectures](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#61-neural-network-architectures)
     - [6.1.1 Embedding the Conditioning Variables](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#611-embedding-the-conditioning-variables)
     - [6.1.2 Diffusion Transformers](Flow%20matching%20and%20diffusion%20model%28MIT%29.md#612-diffusion-transformers)
+
+## Tensor Decomposition and Applications 章节索引
+
+[打开完整笔记](Tensor%20Decomposition%20and%20applications.md)
+
+- [1 Introduction](Tensor%20Decomposition%20and%20applications.md#1-introduction)
+- [2 Notation and Preliminaries](Tensor%20Decomposition%20and%20applications.md#2-notation-and-preliminaries)
+  - [2.1 Rank-One Tensors](Tensor%20Decomposition%20and%20applications.md#21-rank-one-tensors)
+  - [2.2 Symmetry and Tensors](Tensor%20Decomposition%20and%20applications.md#22-symmetry-and-tensors)
+  - [2.3 Diagonal Tensor](Tensor%20Decomposition%20and%20applications.md#23-diagonal-tensor)
+  - [2.4 Matricization: Transforming a Tensor into a Matrix](Tensor%20Decomposition%20and%20applications.md#24-matricization-transforming-a-tensor-into-a-matrix)
+  - [2.5 Tensor Multiplication: The n-Mode Product](Tensor%20Decomposition%20and%20applications.md#25-tensor-multiplication-the-n-mode-product)
+  - [2.6 Matrix Kronecker, Khatri–Rao, and Hadamard Products](Tensor%20Decomposition%20and%20applications.md#26-matrix-kronecker-khatrirao-and-hadamard-products)
+- [3 Tensor Rank and the CANDECOMP/PARAFAC Decomposition](Tensor%20Decomposition%20and%20applications.md#3-tensor-rank-and-the-candecompparafac-decomposition)
+  - [3.1 Tensor Rank](Tensor%20Decomposition%20and%20applications.md#31-tensor-rank)
+  - [3.2 Uniqueness](Tensor%20Decomposition%20and%20applications.md#32-uniqueness)
+  - [3.3 Low-Rank Approximations and the Border Rank](Tensor%20Decomposition%20and%20applications.md#33-low-rank-approximations-and-the-border-rank)
+  - [3.4 Computing the CP Decomposition](Tensor%20Decomposition%20and%20applications.md#34-computing-the-cp-decomposition)
+  - [3.5 Applications of CP](Tensor%20Decomposition%20and%20applications.md#35-applications-of-cp)（待补充）
+- [4 Compression and the Tucker Decomposition](Tensor%20Decomposition%20and%20applications.md#4-compression-and-the-tucker-decomposition)
+  - [4.1 The n-Rank](Tensor%20Decomposition%20and%20applications.md#41-the-n-rank)
+  - [4.2 Computing the Tucker Decomposition](Tensor%20Decomposition%20and%20applications.md#42-computing-the-tucker-decomposition)
+  - [4.3 Lack of Uniqueness and Methods to Overcome It](Tensor%20Decomposition%20and%20applications.md#43-lack-of-uniqueness-and-methods-to-overcome-it)
+  - [4.4 Applications of Tucker](Tensor%20Decomposition%20and%20applications.md#44-applications-of-tucker)（待补充）
 
 ## 数学公式与符号约定
 
