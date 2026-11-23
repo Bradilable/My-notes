@@ -112,3 +112,6 @@ The **Khatri–Rao product** is the “matching columnwise” Kronecker product.
 \mathbf{a}_K\otimes\mathbf{b}_K
 \end{bmatrix}
 ```
+
+The **Hadamard product** is the elementwise matrix product, which is denoted by $A * B$
+
